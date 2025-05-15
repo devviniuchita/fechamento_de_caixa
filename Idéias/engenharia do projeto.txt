@@ -1,0 +1,113 @@
+┌──────────────────────────────────────────────────────────────┐
+│                          USUÁRIO FINAL                       │
+│               (Operador / Gerente de Loja / Adm)             │
+└──────────────┬────────────────────────────┬──────────────────┘
+               │                            │
+        ┌──────▼──────┐              ┌──────▼──────┐
+        │  JavaFX UI  │              │  Web UI     │
+        │ (Desktop)   │              │ (Thymeleaf) │
+        └──────┬──────┘              └──────┬──────┘
+               │                            │
+         RESTful API (Spring Boot + JWT + Spring Security)
+               │
+      ┌────────▼────────────┐
+      │  Application Layer  │  ← lógica de negócio
+      └────────┬────────────┘
+               │
+      ┌────────▼────────────┐
+      │  Repository Layer   │  ← comunicação com o MongoDB
+      └────────┬────────────┘
+               │
+      ┌────────▼────────────┐
+      │     MongoDB         │  ← persistência de dados
+      └─────────────────────┘
+
+📦 MÓDULOS DO SISTEMA
+1. Módulo de Usuários
+Cadastro, login, autenticação via JWT
+
+Perfis: ADMIN, GERENTE, CAIXA
+
+2. Módulo de Fechamento de Caixa
+Registro de:
+
+Data, responsável
+
+Caixa inicial, vendas, troco inserido
+
+Formas de pagamento: dinheiro, PIX, cartão, depósito
+
+Sangrias
+
+Validação de inconsistências nos totais
+
+3. Módulo de Captura de Comprovante
+Upload de imagem (JPG/PNG) do relatório das máquinas de cartão
+
+Armazenamento em MongoDB ou Google Drive (usando a API)
+
+4. Módulo de Relatórios
+Exportação para Excel com Apache POI
+
+Geração de relatório diário, semanal ou mensal
+
+Inclusão opcional de comprovantes no relatório
+
+5. Módulo de Backup
+Integração com Google Drive
+
+Backup automático de fechamentos e comprovantes ao fim do dia
+
+🗂️ ESTRUTURA DE PACOTES (Spring Boot)
+com.seucodigo.fecharcaixa
+├── config          # Configurações de segurança, JWT, etc.
+├── controller      # REST Controllers
+├── dto             # Data Transfer Objects
+├── exception       # Exceções customizadas
+├── model           # Documentos do MongoDB
+├── repository      # Interfaces MongoRepository
+├── service         # Regras de negócio
+├── util            # Utilitários (POI, conversões, etc.)
+└── main            # Classe principal
+
+🖥️ INTERFACE COM JavaFX
+Tela de login
+
+Tela de fechamento de caixa
+
+Formulário para registrar cada entrada
+
+Botão para upload do comprovante
+
+Geração de relatório local ou upload para Drive
+
+🔐 SEGURANÇA
+Spring Security + JWT
+
+Login por e-mail/senha
+
+Autorização por papel (hasRole("GERENTE"), etc.)
+
+Senha criptografada com BCrypt
+
+📊 MODELO DE DOCUMENTO (MongoDB – Exemplo simplificado)
+{
+  "_id": "auto",
+  "data": "2025-04-30",
+  "responsavel": "Vinícius",
+  "caixaInicial": 100,
+  "vendas": 250,
+  "trocoInserido": 50,
+  "formasPagamento": {
+    "dinheiro": 100,
+    "pix": 15,
+    "deposito": 10,
+    "sangria": 40,
+    "vale": 10
+  },
+  "comprovanteCartao": "url ou base64",
+  "totalEntradas": 250,
+  "totalAtivos": 175,
+  "inconsistencia": true
+}
+
