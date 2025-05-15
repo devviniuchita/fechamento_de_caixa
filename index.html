@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Fechamento de Caixa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      .sidebar {
+        transition: all 0.3s;
+      }
+      .sidebar.collapsed {
+        width: 70px;
+      }
+      .sidebar.collapsed .sidebar-text {
+        display: none;
+      }
+      .sidebar.collapsed .logo-text {
+        display: none;
+      }
+      .sidebar.collapsed .menu-item {
+        justify-content: center;
+      }
+      .print-only {
+        display: none;
+      }
+      @media print {
+        .no-print {
+          display: none;
+        }
+        .print-only {
+          display: block;
+        }
+        body {
+          background: white;
+          color: black;
+        }
+      }
+      .input-highlight {
+        transition: all 0.2s;
+      }
+      .input-highlight:focus {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <div class="sidebar bg-blue-800 text-white w-64 flex flex-col no-print">
+        <div class="p-4 flex items-center space-x-2 border-b border-blue-700">
+          <i class="fas fa-cash-register text-2xl"></i>
+          <span class="logo-text text-xl font-bold">Fechamento Caixa</span>
+        </div>
+        <div class="flex-1 overflow-y-auto">
+          <nav class="p-4 space-y-2">
+            <a
+              href="#"
+              class="menu-item flex items-center space-x-2 p-2 rounded hover:bg-blue-700 active"
+              id="dashboard-link"
+            >
+              <i class="fas fa-home"></i>
+              <span class="sidebar-text">Dashboard</span>
+            </a>
+            <a
+              href="#"
+              class="menu-item flex items-center space-x-2 p-2 rounded hover:bg-blue-700"
+              id="fechamento-link"
+            >
+              <i class="fas fa-calculator"></i>
+              <span class="sidebar-text">Fechamento</span>
+            </a>
+            <a
+              href="#"
+              class="menu-item flex items-center space-x-2 p-2 rounded hover:bg-blue-700"
+              id="relatorios-link"
+            >
+              <i class="fas fa-file-excel"></i>
+              <span class="sidebar-text">Relatórios</span>
+            </a>
+            <a
+              href="#"
+              class="menu-item flex items-center space-x-2 p-2 rounded hover:bg-blue-700"
+              id="comprovantes-link"
+            >
+              <i class="fas fa-receipt"></i>
+              <span class="sidebar-text">Comprovantes</span>
+            </a>
+            <a
+              href="#"
+              class="menu-item flex items-center space-x-2 p-2 rounded hover:bg-blue-700"
+              id="usuarios-link"
+            >
+              <i class="fas fa-users"></i>
+              <span class="sidebar-text">Usuários</span>
+            </a>
+          </nav>
+        </div>
+        <div class="p-4 border-t border-blue-700">
+          <button
+            id="toggle-sidebar"
+            class="flex items-center space-x-2 text-gray-300 hover:text-white"
+          >
+            <i class="fas fa-chevron-left"></i>
+            <span class="sidebar-text">Recolher</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top Navigation -->
+        <header class="bg-white shadow-sm z-10 no-print">
+          <div class="flex items-center justify-between p-4">
+            <div class="flex items-center space-x-4">
+              <h1 class="text-xl font-semibold text-gray-800" id="page-title">
+                Dashboard
+              </h1>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="relative">
+                <button class="p-2 rounded-full hover:bg-gray-100">
+                  <i class="fas fa-bell text-gray-600"></i>
+                  <span
+                    class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"
+                  ></span>
+                </button>
+              </div>
+              <div class="flex items-center space-x-2">
+                <div
+                  class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white"
+                >
+                  <span>V</span>
+                </div>
+                <span class="text-sm font-medium">Vinícius</span>
+                <span
+                  class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full"
+                  >Admin</span
+                >
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 bg-gray-50" id="main-content">
+          <!-- Dashboard Content -->
+          <div id="dashboard-content">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div class="bg-white p-4 rounded-lg shadow">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-gray-500">Fechamentos Hoje</p>
+                    <h3 class="text-2xl font-bold">1</h3>
+                  </div>
+                  <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i class="fas fa-calendar-day text-xl"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-lg shadow">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-gray-500">Total Vendas</p>
+                    <h3 class="text-2xl font-bold">R$ 250,00</h3>
+                  </div>
+                  <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i class="fas fa-money-bill-wave text-xl"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-lg shadow">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-gray-500">Inconsistências</p>
+                    <h3 class="text-2xl font-bold">1</h3>
+                  </div>
+                  <div class="p-3 rounded-full bg-red-100 text-red-600">
+                    <i class="fas fa-exclamation-triangle text-xl"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Últimos Fechamentos</h2>
+                <button
+                  class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  Ver todos
+                </button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Data
+                      </th>
+                      <th
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Responsável
+                      </th>
+                      <th
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Vendas
+                      </th>
+                      <th
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Total Caixa
+                      </th>
+                      <th
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        30/04/2025
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        Vinícius
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        R$ 250,00
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        R$ 175,00
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span
+                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                          >Inconsistente</span
+                        >
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        29/04/2025
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        Maria
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        R$ 320,50
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        R$ 320,50
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span
+                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                          >OK</span
+                        >
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fechamento de Caixa Content -->
+          <div id="fechamento-content" class="hidden">
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+              <h2 class="text-xl font-semibold mb-6">Fechamento de Caixa</h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="data"
+                      >Data</label
+                    >
+                    <input
+                      type="date"
+                      id="data"
+                      class="input-highlight w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value="2025-04-30"
+                    />
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="responsavel"
+                      >Responsável</label
+                    >
+                    <input
+                      type="text"
+                      id="responsavel"
+                      class="input-highlight w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value="Vinícius"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="caixa-inicial"
+                      >Caixa Inicial</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="caixa-inicial"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="100.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="vendas"
+                      >Vendas</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="vendas"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="100.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="troco-inserido"
+                      >Troco Inserido</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="troco-inserido"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="50.00"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">Formas de Pagamento</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="dinheiro"
+                      >Dinheiro</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="dinheiro"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="100.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="pix"
+                      >PIX</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="pix"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="15.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="deposito"
+                      >Depósito</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="deposito"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="10.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="sangria"
+                      >Sangria</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="sangria"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="40.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="vale"
+                      >Cartão Presente/Vale</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="vale"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="10.00"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">Cartões de Débito</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="visa-debito"
+                      >Visa Débito</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="visa-debito"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="5.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="master-debito"
+                      >Master Débito</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="master-debito"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="5.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="elo-debito"
+                      >Elo Débito</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="elo-debito"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="20.00"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">Cartões de Crédito</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="visa-credito"
+                      >Visa Crédito</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="visa-credito"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="5.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="master-credito"
+                      >Master Crédito</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="master-credito"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="5.00"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="elo-credito"
+                      >Elo Crédito</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="elo-credito"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="5.00"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">Outros</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="voucher"
+                      >Voucher</label
+                    >
+                    <div class="relative">
+                      <span class="absolute left-3 top-2">R$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="voucher"
+                        class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="5.00"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">Despesas</h3>
+                <div id="despesas-container">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <label
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        for="despesa-desc-1"
+                        >Descrição</label
+                      >
+                      <input
+                        type="text"
+                        id="despesa-desc-1"
+                        class="input-highlight w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="Café"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        for="despesa-valor-1"
+                        >Valor</label
+                      >
+                      <div class="relative">
+                        <span class="absolute left-3 top-2">R$</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          id="despesa-valor-1"
+                          class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value="10.00"
+                        />
+                      </div>
+                    </div>
+                    <div class="flex items-end">
+                      <button
+                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm"
+                        onclick="removerDespesa(1)"
+                      >
+                        <i class="fas fa-trash"></i> Remover
+                      </button>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <label
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        for="despesa-desc-2"
+                        >Descrição</label
+                      >
+                      <input
+                        type="text"
+                        id="despesa-desc-2"
+                        class="input-highlight w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="Devolução"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        for="despesa-valor-2"
+                        >Valor</label
+                      >
+                      <div class="relative">
+                        <span class="absolute left-3 top-2">R$</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          id="despesa-valor-2"
+                          class="input-highlight w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value="15.00"
+                        />
+                      </div>
+                    </div>
+                    <div class="flex items-end">
+                      <button
+                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm"
+                        onclick="removerDespesa(2)"
+                      >
+                        <i class="fas fa-trash"></i> Remover
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  id="adicionar-despesa"
+                  class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-md text-sm"
+                >
+                  <i class="fas fa-plus"></i> Adicionar Despesa
+                </button>
+              </div>
+
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">
+                  Comprovante de Cartão
+                </h3>
+                <div
+                  class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
+                >
+                  <i
+                    class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"
+                  ></i>
+                  <p class="text-gray-500 mb-2">
+                    Arraste e solte o arquivo aqui ou
+                  </p>
+                  <button
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                  >
+                    <i class="fas fa-folder-open mr-2"></i>Selecionar Arquivo
+                  </button>
+                  <p class="text-gray-400 text-sm mt-2">
+                    Formatos suportados: JPG, PNG, PDF
+                  </p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                  <h4 class="font-semibold text-blue-800 mb-2">Resumo</h4>
+                  <div class="space-y-2">
+                    <div class="flex justify-between">
+                      <span>Total Entradas:</span>
+                      <span class="font-medium" id="total-entradas"
+                        >R$ 0,00</span
+                      >
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Total Ativos:</span>
+                      <span class="font-medium" id="total-ativos">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Total Débito:</span>
+                      <span class="font-medium" id="total-debito">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Total Crédito:</span>
+                      <span class="font-medium" id="total-credito"
+                        >R$ 0,00</span
+                      >
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Total Cartões:</span>
+                      <span class="font-medium" id="total-cartoes"
+                        >R$ 0,00</span
+                      >
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Total Despesas:</span>
+                      <span class="font-medium" id="total-despesas"
+                        >R$ 0,00</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                  <h4 class="font-semibold text-red-800 mb-2">Total Caixa</h4>
+                  <div class="text-2xl font-bold" id="total-caixa">R$ 0,00</div>
+                  <div
+                    class="mt-2 text-sm text-red-600 hidden"
+                    id="inconsistencia-message"
+                  >
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    Há uma inconsistência nos valores
+                  </div>
+                </div>
+              </div>
+
+              <!-- Informações de Impressão (visíveis apenas na impressão) -->
+              <div class="print-only mt-8">
+                <div class="text-center mb-4">
+                  <h2 class="text-xl font-bold">Fechamento de Caixa</h2>
+                  <p class="text-sm text-gray-600">
+                    Data: <span id="print-date"></span> - Hora:
+                    <span id="print-time"></span>
+                  </p>
+                  <p class="text-sm">Status: <span id="print-status"></span></p>
+                </div>
+              </div>
+
+              <div class="flex justify-end space-x-4">
+                <button
+                  class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
+                >
+                  <i class="fas fa-save mr-2"></i>Salvar Rascunho
+                </button>
+                <button
+                  class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                >
+                  <i class="fas fa-check-circle mr-2"></i>Finalizar Fechamento
+                </button>
+                <button
+                  class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                  onclick="window.print()"
+                >
+                  <i class="fas fa-print mr-2"></i>Imprimir
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Relatórios Content -->
+          <div id="relatorios-content" class="hidden">
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+              <h2 class="text-xl font-semibold mb-6">Relatórios</h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div
+                  class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                >
+                  <h3 class="font-semibold mb-3">Relatório Diário</h3>
+                  <div class="mb-3">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="data-relatorio"
+                      >Data</label
+                    >
+                    <input
+                      type="date"
+                      id="data-relatorio"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <button
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md"
+                  >
+                    <i class="fas fa-file-excel mr-2"></i>Gerar Excel
+                  </button>
+                </div>
+
+                <div
+                  class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                >
+                  <h3 class="font-semibold mb-3">Relatório Semanal</h3>
+                  <div class="mb-3">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="semana-relatorio"
+                      >Semana</label
+                    >
+                    <select
+                      id="semana-relatorio"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    >
+                      <option>Selecione...</option>
+                      <option>Semana 1 (01/04 - 07/04)</option>
+                      <option>Semana 2 (08/04 - 14/04)</option>
+                      <option>Semana 3 (15/04 - 21/04)</option>
+                      <option>Semana 4 (22/04 - 28/04)</option>
+                      <option>Semana 5 (29/04 - 05/05)</option>
+                    </select>
+                  </div>
+                  <button
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md"
+                  >
+                    <i class="fas fa-file-excel mr-2"></i>Gerar Excel
+                  </button>
+                </div>
+
+                <div
+                  class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                >
+                  <h3 class="font-semibold mb-3">Relatório Mensal</h3>
+                  <div class="mb-3">
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="mes-relatorio"
+                      >Mês</label
+                    >
+                    <select
+                      id="mes-relatorio"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    >
+                      <option>Selecione...</option>
+                      <option>Janeiro 2025</option>
+                      <option>Fevereiro 2025</option>
+                      <option>Março 2025</option>
+                      <option>Abril 2025</option>
+                      <option>Maio 2025</option>
+                    </select>
+                  </div>
+                  <button
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md"
+                  >
+                    <i class="fas fa-file-excel mr-2"></i>Gerar Excel
+                  </button>
+                </div>
+              </div>
+
+              <div class="bg-white p-4 rounded-lg shadow">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-lg font-semibold">Histórico de Relatórios</h3>
+                  <div class="flex space-x-2">
+                    <button
+                      class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm"
+                    >
+                      <i class="fas fa-filter mr-1"></i>Filtrar
+                    </button>
+                    <button
+                      class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm"
+                    >
+                      <i class="fas fa-sync-alt mr-1"></i>Atualizar
+                    </button>
+                  </div>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Data Geração
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Tipo
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Período
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Ações
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          30/04/2025 18:30
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          Diário
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          30/04/2025
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <button
+                            class="text-blue-600 hover:text-blue-800 mr-3"
+                          >
+                            <i class="fas fa-download"></i>
+                          </button>
+                          <button class="text-green-600 hover:text-green-800">
+                            <i class="fas fa-print"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          28/04/2025 09:15
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          Semanal
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          22/04 - 28/04
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <button
+                            class="text-blue-600 hover:text-blue-800 mr-3"
+                          >
+                            <i class="fas fa-download"></i>
+                          </button>
+                          <button class="text-green-600 hover:text-green-800">
+                            <i class="fas fa-print"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comprovantes Content -->
+          <div id="comprovantes-content" class="hidden">
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+              <h2 class="text-xl font-semibold mb-6">Comprovantes</h2>
+
+              <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-lg font-semibold">Upload de Comprovantes</h3>
+                </div>
+                <div
+                  class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center"
+                >
+                  <i
+                    class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"
+                  ></i>
+                  <p class="text-gray-500 mb-4">
+                    Arraste e solte os arquivos aqui ou
+                  </p>
+                  <button
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md"
+                  >
+                    <i class="fas fa-folder-open mr-2"></i>Selecionar Arquivos
+                  </button>
+                  <p class="text-gray-400 text-sm mt-4">
+                    Formatos suportados: JPG, PNG, PDF (Máx. 5MB cada)
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-lg font-semibold">
+                    Comprovantes Cadastrados
+                  </h3>
+                  <div class="flex space-x-2">
+                    <button
+                      class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm"
+                    >
+                      <i class="fas fa-filter mr-1"></i>Filtrar
+                    </button>
+                    <button
+                      class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm"
+                    >
+                      <i class="fas fa-sync-alt mr-1"></i>Atualizar
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                >
+                  <div
+                    class="border border-gray-200 rounded-lg overflow-hidden"
+                  >
+                    <div
+                      class="bg-gray-100 p-3 flex justify-between items-center"
+                    >
+                      <span class="text-sm font-medium">30/04/2025</span>
+                      <div class="flex space-x-2">
+                        <button class="text-blue-500 hover:text-blue-700">
+                          <i class="fas fa-download"></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="p-4">
+                      <div
+                        class="bg-gray-200 h-40 flex items-center justify-center"
+                      >
+                        <i class="fas fa-file-image text-4xl text-gray-400"></i>
+                      </div>
+                      <div class="mt-3">
+                        <p class="text-sm font-medium">Comprovante Visa</p>
+                        <p class="text-xs text-gray-500">Tamanho: 1.2MB</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="border border-gray-200 rounded-lg overflow-hidden"
+                  >
+                    <div
+                      class="bg-gray-100 p-3 flex justify-between items-center"
+                    >
+                      <span class="text-sm font-medium">29/04/2025</span>
+                      <div class="flex space-x-2">
+                        <button class="text-blue-500 hover:text-blue-700">
+                          <i class="fas fa-download"></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="p-4">
+                      <div
+                        class="bg-gray-200 h-40 flex items-center justify-center"
+                      >
+                        <i class="fas fa-file-pdf text-4xl text-gray-400"></i>
+                      </div>
+                      <div class="mt-3">
+                        <p class="text-sm font-medium">Comprovante Master</p>
+                        <p class="text-xs text-gray-500">Tamanho: 2.1MB</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="border border-gray-200 rounded-lg overflow-hidden"
+                  >
+                    <div
+                      class="bg-gray-100 p-3 flex justify-between items-center"
+                    >
+                      <span class="text-sm font-medium">28/04/2025</span>
+                      <div class="flex space-x-2">
+                        <button class="text-blue-500 hover:text-blue-700">
+                          <i class="fas fa-download"></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="p-4">
+                      <div
+                        class="bg-gray-200 h-40 flex items-center justify-center"
+                      >
+                        <i class="fas fa-file-image text-4xl text-gray-400"></i>
+                      </div>
+                      <div class="mt-3">
+                        <p class="text-sm font-medium">Comprovante Elo</p>
+                        <p class="text-xs text-gray-500">Tamanho: 0.8MB</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Usuários Content -->
+          <div id="usuarios-content" class="hidden">
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+              <h2 class="text-xl font-semibold mb-6">
+                Gerenciamento de Usuários
+              </h2>
+
+              <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-lg font-semibold">Cadastrar Novo Usuário</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="nome-usuario"
+                      >Nome Completo</label
+                    >
+                    <input
+                      type="text"
+                      id="nome-usuario"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="email-usuario"
+                      >E-mail</label
+                    >
+                    <input
+                      type="email"
+                      id="email-usuario"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="login-usuario"
+                      >Login</label
+                    >
+                    <input
+                      type="text"
+                      id="login-usuario"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="senha-usuario"
+                      >Senha</label
+                    >
+                    <input
+                      type="password"
+                      id="senha-usuario"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block text-gray-700 text-sm font-bold mb-2"
+                      for="perfil-usuario"
+                      >Perfil</label
+                    >
+                    <select
+                      id="perfil-usuario"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    >
+                      <option>Selecione...</option>
+                      <option>Administrador</option>
+                      <option>Gerente</option>
+                      <option>Operador de Caixa</option>
+                    </select>
+                  </div>
+                  <div class="flex items-end">
+                    <button
+                      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                    >
+                      <i class="fas fa-user-plus mr-2"></i>Cadastrar Usuário
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-lg font-semibold">Usuários Cadastrados</h3>
+                  <div class="flex space-x-2">
+                    <button
+                      class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm"
+                    >
+                      <i class="fas fa-filter mr-1"></i>Filtrar
+                    </button>
+                    <button
+                      class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm"
+                    >
+                      <i class="fas fa-sync-alt mr-1"></i>Atualizar
+                    </button>
+                  </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Nome
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Login
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          E-mail
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Perfil
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Status
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Ações
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          Vinícius
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          vinicius
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          vinicius@empresa.com
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                            >Admin</span
+                          >
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                            >Ativo</span
+                          >
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <button
+                            class="text-blue-600 hover:text-blue-800 mr-2"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          Maria
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          maria
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          maria@empresa.com
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800"
+                            >Gerente</span
+                          >
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                            >Ativo</span
+                          >
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <button
+                            class="text-blue-600 hover:text-blue-800 mr-2"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          João
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          joao
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          joao@empresa.com
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                            >Caixa</span
+                          >
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                            >Pendente</span
+                          >
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          <button
+                            class="text-blue-600 hover:text-blue-800 mr-2"
+                          >
+                            <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="public/js/app.js"></script>
+  </body>
+</html>
