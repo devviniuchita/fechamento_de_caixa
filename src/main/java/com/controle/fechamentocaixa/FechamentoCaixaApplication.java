@@ -9,19 +9,28 @@ import javafx.stage.Stage;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Classe principal da aplicação que integra Spring Boot com JavaFX.
  * Responsável por inicializar o contexto Spring e carregar a interface gráfica.
  */
 @SpringBootApplication
-@Slf4j
+@ComponentScan(basePackages = "com.controle.fechamentocaixa")
+@EnableMongoRepositories(basePackages = "com.controle.fechamentocaixa.repository")
+@EntityScan(basePackages = "com.controle.fechamentocaixa.model")
 public class FechamentoCaixaApplication extends Application {
 
+    private static final Logger logger = LoggerFactory.getLogger(FechamentoCaixaApplication.class);
     private ConfigurableApplicationContext springContext;
+    private static String[] savedArgs;
 
     public static void main(String[] args) {
+        savedArgs = args;
         launch(args);
     }
 
@@ -29,7 +38,7 @@ public class FechamentoCaixaApplication extends Application {
     public void init() {
         springContext = new SpringApplicationBuilder(FechamentoCaixaApplication.class)
             .headless(false)
-            .run();
+            .run(savedArgs);
     }
 
     @Override
@@ -45,9 +54,9 @@ public class FechamentoCaixaApplication extends Application {
             primaryStage.setScene(scene);
             primaryStage.show();
             
-            log.info("Aplicação JavaFX iniciada com sucesso");
+            logger.info("Aplicação JavaFX iniciada com sucesso");
         } catch (Exception e) {
-            log.error("Erro ao iniciar a aplicação JavaFX", e);
+            logger.error("Erro ao iniciar a aplicação JavaFX", e);
             Platform.exit();
         }
     }
@@ -56,6 +65,6 @@ public class FechamentoCaixaApplication extends Application {
     public void stop() {
         springContext.close();
         Platform.exit();
-        log.info("Aplicação encerrada");
+        logger.info("Aplicação encerrada");
     }
 } 

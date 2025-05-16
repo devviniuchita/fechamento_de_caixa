@@ -12,13 +12,17 @@ Sistema empresarial para gerenciamento completo de fechamento de caixa, oferecen
   - Spring Boot 2.7.18
   - Java 17
   - Maven
+  - Jakarta Validation
+  - Hibernate Validator
+  - Lombok
 - **Banco de Dados**:
   - MongoDB 4.4+
 - **Segurança**:
   - Spring Security
   - JWT (JSON Web Tokens)
+  - BCrypt para senhas
 - **Interfaces**:
-  - Desktop: JavaFX
+  - Desktop: JavaFX 17.0.2
   - Web: Thymeleaf + Bootstrap
 - **Integrações**:
   - Google Drive API (armazenamento/backup)
@@ -29,17 +33,20 @@ Sistema empresarial para gerenciamento completo de fechamento de caixa, oferecen
 ### 2.1 Organização de Pacotes
 
 ```
-com.seucodigo.fecharcaixa/
-├── config/           # Configurações (Spring, Security, MongoDB)
-├── controller/       # Controllers REST
-├── dto/             # Objetos de transferência de dados
-├── model/           # Entidades do MongoDB
-├── repository/      # Interfaces MongoRepository
-├── service/         # Lógica de negócio
-├── security/        # Implementação JWT
-├── util/           # Classes utilitárias
-├── exception/       # Exceções customizadas
-└── validation/      # Validadores
+com.controle.fechamentocaixa/
+├── config/           # Configurações Spring Boot e MongoDB
+├── controller/       # Controllers REST e endpoints da API
+├── dto/             # DTOs (CashClosing, Receipt, etc)
+├── exception/       # Tratamento de exceções e erros
+├── frontend/        # Interface desktop JavaFX
+│   ├── controller/  # Controladores JavaFX
+│   ├── service/     # Serviços específicos do frontend
+│   └── util/        # Utilitários da interface
+├── model/           # Entidades do domínio com validações
+├── repository/      # Repositórios MongoDB
+├── security/        # Configuração JWT e autenticação
+└── service/         # Regras de negócio e integrações
+    └── impl/        # Implementações dos serviços
 ```
 
 ### 2.2 Camadas e Responsabilidades
@@ -47,19 +54,24 @@ com.seucodigo.fecharcaixa/
 #### 2.2.1 Controllers (`controller/`)
 
 - Exposição de endpoints REST
-- Validação básica de requisições
-- Controle de acesso por role
-- Tratamento inicial de erros
+- Validação com Jakarta Validation
+- Controle de acesso baseado em roles
+- Tratamento global de exceções
+- Documentação Swagger/OpenAPI
 
 Exemplo (CashClosingController):
 
 ```java
 @RestController
 @RequestMapping("/api/cash-closings")
+@Validated
 public class CashClosingController {
     @PostMapping
     @PreAuthorize("hasAnyRole('CAIXA', 'GERENTE', 'ADMIN')")
-    public ResponseEntity<CashClosingDTO> create(@Valid @RequestBody CashClosingDTO dto) {
+    public ResponseEntity<CashClosingDTO> create(
+        @Valid @RequestBody CashClosingDTO dto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
         // Implementação
     }
 }
@@ -71,17 +83,21 @@ public class CashClosingController {
 - Validações complexas
 - Orquestração de operações
 - Transações
+- Integração com Google Drive
 
 Exemplo (CashClosingService):
 
 ```java
 @Service
-public class CashClosingService {
+@Validated
+public class CashClosingServiceImpl implements CashClosingService {
+    @Transactional
     public CashClosing create(CashClosingDTO dto) {
         validateBalances(dto);
-        // Lógica de criação
+        CashClosing cashClosing = mapper.toEntity(dto);
+        uploadReceipts(cashClosing);
         notifyManagers(cashClosing);
-        return cashClosing;
+        return repository.save(cashClosing);
     }
 }
 ```
@@ -91,49 +107,75 @@ public class CashClosingService {
 - Interfaces MongoDB
 - Queries customizadas
 - Índices e otimizações
+- Agregações
 
 Exemplo (CashClosingRepository):
 
 ```java
 @Repository
 public interface CashClosingRepository extends MongoRepository<CashClosing, String> {
-    List<CashClosing> findByDataHoraBetween(LocalDateTime inicio, LocalDateTime fim);
+    @Query("{'dataHora': {$gte: ?0, $lte: ?1}}")
+    List<CashClosing> findByPeriod(LocalDateTime inicio, LocalDateTime fim);
+
+    @Aggregation(pipeline = {
+        "{'$match': {'status': 'FECHADO'}}",
+        "{'$group': {'_id': '$operador', 'total': {'$sum': '$valorTotal'}}}"
+    })
+    List<OperatorTotalDTO> getTotalsByOperator();
 }
 ```
 
 #### 2.2.4 Models (`model/`)
 
 - Documentos MongoDB
-- Validações JPA
-- Relacionamentos
+- Validações Jakarta
+- Lombok para redução de boilerplate
+- Auditoria
 
 Exemplo (CashClosing):
 
 ```java
+@Data
 @Document(collection = "cash_closings")
 public class CashClosing {
     @Id
     private String id;
 
-    @NotNull
+    @NotNull(message = "Saldo inicial é obrigatório")
     private BigDecimal saldoInicial;
-    // Outros campos
+
+    @CreatedDate
+    private LocalDateTime dataCriacao;
+
+    @LastModifiedDate
+    private LocalDateTime dataAtualizacao;
+
+    @CreatedBy
+    private String criadoPor;
 }
 ```
 
 #### 2.2.5 DTOs (`dto/`)
 
 - Transferência de dados
-- Validações
-- Conversões
+- Validações Jakarta
+- Conversões e mapeamentos
+- Documentação
 
 Exemplo (CashClosingDTO):
 
 ```java
+@Data
 public class CashClosingDTO {
     @NotNull(message = "Saldo inicial é obrigatório")
+    @DecimalMin(value = "0.0", message = "Saldo inicial deve ser positivo")
     private BigDecimal saldoInicial;
-    // Outros campos e validações
+
+    @Valid
+    private List<PaymentMethodDTO> formasPagamento;
+
+    @Size(max = 255, message = "Observação não pode exceder 255 caracteres")
+    private String observacao;
 }
 ```
 
@@ -143,78 +185,93 @@ public class CashClosingDTO {
 
 - **Funcionalidades**:
   - Cadastro e gestão de usuários
-  - Autenticação JWT
+  - Autenticação JWT com refresh token
   - Autorização por roles
+  - Auditoria de ações
 - **Roles**:
   - ADMIN: Acesso total
   - GERENTE: Conferência e relatórios
   - CAIXA: Operações básicas
 - **Fluxo de Autenticação**:
   1. Login com credenciais
-  2. Geração de JWT
-  3. Uso do token nas requisições
+  2. Validação e geração de JWT
+  3. Refresh token para renovação
   4. Validação de permissões
+  5. Registro de auditoria
 
 ### 3.2 Fechamento de Caixa
 
 - **Operações**:
-  - Abertura de caixa
-  - Registro de movimentações
-  - Fechamento com conferência
-  - Sangrias e suprimentos
+  - Abertura de caixa com validação
+  - Registro de movimentações em tempo real
+  - Fechamento com dupla conferência
+  - Sangrias e suprimentos com aprovação
 - **Validações**:
   - Saldo inicial vs final
   - Totais por forma de pagamento
   - Comprovantes obrigatórios
+  - Consistência de horários
 - **Fluxo de Fechamento**:
   1. Registro de movimentações
   2. Upload de comprovantes
-  3. Conferência por superior
-  4. Geração de relatório
+  3. Validações automáticas
+  4. Conferência por superior
+  5. Geração de relatório
+  6. Backup no Google Drive
 
 ### 3.3 Gestão de Comprovantes
 
 - **Funcionalidades**:
-  - Upload de imagens
-  - Validação de formato
+  - Upload multi-arquivo
+  - Validação de formato e tamanho
+  - Compressão automática
   - Armazenamento no Drive
-  - Vinculação ao fechamento
+  - Backup redundante
 - **Formatos Suportados**:
-  - JPG/JPEG
-  - PNG
-  - PDF
+  - JPG/JPEG (max 5MB)
+  - PNG (max 5MB)
+  - PDF (max 10MB)
 - **Fluxo de Upload**:
   1. Validação do arquivo
-  2. Upload para Google Drive
-  3. Armazenamento da referência
-  4. Vinculação ao fechamento
+  2. Compressão se necessário
+  3. Upload para Google Drive
+  4. Geração de backup
+  5. Vinculação ao fechamento
 
 ### 3.4 Relatórios
 
 - **Tipos**:
-  - Diário
-  - Semanal
-  - Mensal
-  - Por operador
+  - Diário com detalhamento
+  - Semanal consolidado
+  - Mensal com gráficos
+  - Por operador com métricas
+  - Inconsistências e ajustes
 - **Formatos**:
-  - Excel (XLSX)
-  - PDF
-- **Conteúdo**:
-  - Movimentações
-  - Totalizadores
-  - Comprovantes
-  - Inconsistências
+  - Excel (XLSX) com formatação
+  - PDF para impressão
+  - CSV para exportação
+- **Características**:
+  - Gráficos dinâmicos
+  - Filtros avançados
+  - Exportação automática
+  - Envio por email
+  - Agendamento de geração
 
-### 3.5 Backup e Integração Drive
+### 3.5 Backup e Recuperação
 
-- **Funcionalidades**:
-  - Backup automático diário
-  - Armazenamento de comprovantes
-  - Organização por data
-- **Configurações**:
-  - Credenciais Google
-  - Pasta destino
-  - Agendamento
+- **Estratégias**:
+  - Backup incremental diário
+  - Backup completo semanal
+  - Replicação MongoDB
+  - Versionamento de documentos
+- **Locais de Armazenamento**:
+  - Google Drive (documentos)
+  - MongoDB Atlas (dados)
+  - Servidor local (logs)
+- **Recuperação**:
+  - Point-in-time recovery
+  - Restauração seletiva
+  - Verificação de integridade
 
 ## 4. Interfaces
 
