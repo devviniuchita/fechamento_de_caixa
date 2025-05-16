@@ -1,158 +1,105 @@
 # Sistema de Fechamento de Caixa
 
-Sistema para gerenciamento e fechamento de caixa com suporte a múltiplos tipos de pagamento, geração de relatórios e backup automático.
+Sistema para gerenciamento e controle de fechamento de caixa com interface desktop (JavaFX) e web (Thymeleaf).
 
-## Tecnologias Utilizadas
+## Tecnologias
 
 - Java 17
 - Spring Boot 2.7.18
+- JavaFX 17.0.2
 - MongoDB
 - Spring Security + JWT
-- JavaFX
-- Thymeleaf
-- Google Drive API
-- Apache POI
+- Google Drive API (para armazenamento de comprovantes)
+- Apache POI (para geração de relatórios Excel)
+- Jakarta Validation (para validação de dados)
+- Hibernate Validator
+- Lombok (para redução de boilerplate)
 
-## Requisitos
+## Estrutura do Projeto
 
-- JDK 17
-- MongoDB 4.4+
-- Maven 3.6+
-- Node.js 18+ (para interface web)
+```
+src/main/java/com/controle/fechamentocaixa/
+├── config/         # Configurações do Spring Boot e MongoDB
+├── controller/     # Controllers REST e endpoints da API
+├── dto/           # Data Transfer Objects (CashClosing, Receipt, etc)
+├── exception/     # Tratamento de exceções e erros
+├── frontend/      # Interface desktop JavaFX
+│   ├── controller/  # Controladores JavaFX
+│   ├── service/     # Serviços específicos do frontend
+│   └── util/        # Utilitários da interface
+├── model/         # Entidades do domínio com validações
+├── repository/    # Repositórios MongoDB
+├── security/      # Configuração JWT e autenticação
+└── service/       # Regras de negócio e integrações
+    └── impl/      # Implementações dos serviços
+```
+
+## Funcionalidades
+
+- Autenticação e autorização de usuários com JWT
+- Interface desktop responsiva com JavaFX
+- Interface web moderna com Thymeleaf
+- Registro e gerenciamento de fechamentos de caixa
+- Upload e gestão de comprovantes no Google Drive
+- Geração de relatórios detalhados em Excel
+- Validação robusta de dados e inconsistências
+- Controle de múltiplas formas de pagamento
+- Tratamento de exceções e erros
+- Backup automático de dados
 
 ## Configuração
 
-1. Clone o repositório:
+1. Clone o repositório
+2. Configure as credenciais do MongoDB no `application.properties`:
+   ```properties
+   spring.data.mongodb.uri=mongodb://localhost:27017/fechamento_caixa
+   ```
+3. Configure as credenciais do Google Drive API:
+   - Adicione o arquivo `credentials.json` na pasta `src/main/resources`
+   - Configure o `application.properties` com o path do arquivo
+4. Execute `mvn clean install`
+
+## Execução
+
+Para executar a aplicação desktop:
 
 ```bash
-git clone https://github.com/seu-usuario/fechamento-de-caixa.git
-cd fechamento-de-caixa
+mvn javafx:run
 ```
 
-2. Configure o MongoDB:
-
-- Instale o MongoDB
-- Crie um banco de dados chamado `fechamento_caixa`
-- O sistema irá criar as coleções automaticamente
-
-3. Configure as variáveis de ambiente (opcional):
-
-```bash
-export JWT_SECRET=seu_secret_jwt_aqui
-export JWT_EXPIRATION=86400000
-```
-
-4. Configure as credenciais do Google Drive (para backup):
-
-- Crie um projeto no Google Cloud Console
-- Habilite a Google Drive API
-- Baixe as credenciais e salve como `credentials.json` em `src/main/resources/`
-
-## Compilação e Execução
-
-1. Compile o projeto:
-
-```bash
-mvn clean install
-```
-
-2. Execute a aplicação:
+Para executar o servidor web:
 
 ```bash
 mvn spring-boot:run
 ```
 
-A aplicação estará disponível em:
+## Segurança
 
-- API REST: http://localhost:8080/api
-- Interface Web: http://localhost:8080/api/web
-- Interface JavaFX: Execute a classe `JavaFXApplication`
+- Autenticação baseada em JWT
+- Senhas criptografadas com BCrypt
+- Validação de dados com Jakarta Validation
+- Proteção contra CSRF em endpoints web
+- Controle de acesso baseado em roles
+- Sessões seguras e timeout configurável
 
-## Estrutura do Projeto
+## Desenvolvimento
 
-```
-src/
-├── main/
-│   ├── java/
-│   │   └── com/seucodigo/fecharcaixa/
-│   │       ├── config/
-│   │       ├── controller/
-│   │       ├── model/
-│   │       ├── repository/
-│   │       ├── security/
-│   │       └── service/
-│   └── resources/
-│       ├── static/
-│       ├── templates/
-│       └── application.yml
-```
+Para contribuir com o projeto:
 
-## Funcionalidades
-
-- [x] Autenticação e Autorização
-
-  - Login/Logout
-  - Roles (ADMIN, GERENTE, CAIXA)
-  - JWT Token
-
-- [x] Gestão de Usuários
-
-  - CRUD completo
-  - Alteração de senha
-  - Controle de acesso
-
-- [x] Fechamento de Caixa
-
-  - Registro de operações
-  - Múltiplos tipos de pagamento
-  - Conferência e aprovação
-
-- [ ] Comprovantes
-
-  - Upload de imagens
-  - Armazenamento no Google Drive
-  - Vinculação com fechamento
-
-- [ ] Relatórios
-
-  - Diários
-  - Mensais
-  - Por operador
-  - Exportação Excel
-
-- [ ] Backup
-  - Automático
-  - Google Drive
-  - Restauração
-
-## API Endpoints
-
-### Autenticação
-
-- POST `/api/auth/login` - Login
-- POST `/api/auth/refresh` - Renovar token
-
-### Fechamento de Caixa
-
-- POST `/api/cash-closings` - Criar fechamento
-- GET `/api/cash-closings/{id}` - Buscar fechamento
-- PUT `/api/cash-closings/{id}` - Atualizar fechamento
-- DELETE `/api/cash-closings/{id}` - Excluir fechamento
-
-### Relatórios
-
-- GET `/api/cash-closings/reports/daily/{date}` - Relatório diário
-- GET `/api/cash-closings/reports/weekly/{startDate}` - Relatório semanal
-- GET `/api/cash-closings/reports/monthly/{month}` - Relatório mensal
-
-## Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/nome-da-feature`)
+3. Faça commit das mudanças (`git commit -am 'Adiciona nova feature'`)
+4. Faça push para a branch (`git push origin feature/nome-da-feature`)
 5. Crie um Pull Request
+
+### Padrões de Código
+
+- Utilize as anotações do Lombok para redução de boilerplate
+- Siga as convenções de nomenclatura Java
+- Mantenha a cobertura de testes
+- Documente novas funcionalidades
+- Valide os dados usando Jakarta Validation
 
 ## Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.

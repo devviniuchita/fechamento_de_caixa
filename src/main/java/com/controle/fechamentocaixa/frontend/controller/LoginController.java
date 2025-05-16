@@ -5,17 +5,15 @@ import com.controle.fechamentocaixa.frontend.util.AlertUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
 
 /**
  * Controller da tela de login.
  * Gerencia a autenticação do usuário na interface desktop.
  */
-@Component
-@RequiredArgsConstructor
 @Slf4j
+@Controller
 public class LoginController {
     
     private final AuthService authService;
@@ -25,6 +23,10 @@ public class LoginController {
     
     @FXML
     private PasswordField passwordField;
+    
+    public LoginController(AuthService authService) {
+        this.authService = authService;
+    }
     
     @FXML
     public void initialize() {
@@ -38,20 +40,24 @@ public class LoginController {
         String password = passwordField.getText();
         
         if (username.isEmpty() || password.isEmpty()) {
-            AlertUtils.showWarning("Validação", "Campos obrigatórios", 
-                "Por favor, preencha usuário e senha.");
+            log.warn("Tentativa de login com campos vazios");
+            AlertUtils.showWarning("Campos Vazios", "Por favor, preencha todos os campos", "Username e senha são obrigatórios");
             return;
         }
         
         try {
-            log.debug("Tentando autenticar usuário: {}", username);
-            authService.login(username, password);
-            // TODO: Navegar para tela principal após implementar AuthService
-            log.info("Usuário {} autenticado com sucesso", username);
+            boolean success = authService.authenticate(username, password);
+            if (success) {
+                log.info("Login bem sucedido para usuário: {}", username);
+                // Navegar para a próxima tela
+            } else {
+                log.warn("Falha na autenticação para usuário: {}", username);
+                log.debug("Credenciais inválidas");
+                AlertUtils.showError("Erro de Login", "Credenciais Inválidas", "Username ou senha incorretos");
+            }
         } catch (Exception e) {
-            log.error("Erro ao realizar login", e);
-            AlertUtils.showError("Erro de Login", "Não foi possível fazer login", 
-                e.getMessage());
+            log.error("Erro durante o login", e);
+            AlertUtils.showInfo("Erro", "Erro no Sistema", "Ocorreu um erro ao processar o login");
         }
     }
     
