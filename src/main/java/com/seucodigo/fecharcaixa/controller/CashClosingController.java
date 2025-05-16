@@ -1,24 +1,20 @@
 package com.seucodigo.fecharcaixa.controller;
 
-import com.seucodigo.fecharcaixa.dto.CashClosingDTO;
 import com.seucodigo.fecharcaixa.model.CashClosing;
 import com.seucodigo.fecharcaixa.service.CashClosingService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
+import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cash-closings")
+@RequestMapping("/cash-closings")
 @RequiredArgsConstructor
 public class CashClosingController {
 
@@ -27,94 +23,67 @@ public class CashClosingController {
     @PostMapping
     @PreAuthorize("hasAnyRole('CAIXA', 'GERENTE', 'ADMIN')")
     public ResponseEntity<CashClosing> createCashClosing(
-            @Valid @RequestBody CashClosingDTO cashClosingDTO,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(cashClosingService.createCashClosing(cashClosingDTO, userDetails.getUsername()));
+            @Valid @RequestBody CashClosing cashClosing,
+            Authentication authentication) {
+        cashClosing.setUserId(authentication.getName());
+        return ResponseEntity.ok(cashClosingService.createCashClosing(cashClosing));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CAIXA', 'GERENTE', 'ADMIN')")
     public ResponseEntity<CashClosing> updateCashClosing(
             @PathVariable String id,
-            @Valid @RequestBody CashClosingDTO cashClosingDTO) {
-        return ResponseEntity.ok(cashClosingService.updateCashClosing(id, cashClosingDTO));
+            @Valid @RequestBody CashClosing cashClosing) {
+        return ResponseEntity.ok(cashClosingService.updateCashClosing(id, cashClosing));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCashClosing(@PathVariable String id) {
         cashClosingService.deleteCashClosing(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('CAIXA', 'GERENTE', 'ADMIN')")
-    public ResponseEntity<CashClosing> getCashClosingById(@PathVariable String id) {
-        return ResponseEntity.ok(cashClosingService.getCashClosingById(id));
+    public ResponseEntity<CashClosing> getCashClosing(@PathVariable String id) {
+        return ResponseEntity.ok(cashClosingService.findById(id));
     }
 
-    @GetMapping("/date/{date}")
+    @GetMapping("/user/{userId}")
     @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
-    public ResponseEntity<List<CashClosing>> getCashClosingsByDate(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(cashClosingService.getCashClosingsByDate(date));
+    public ResponseEntity<List<CashClosing>> getCashClosingsByUser(@PathVariable String userId) {
+        return ResponseEntity.ok(cashClosingService.findByUserId(userId));
     }
 
-    @GetMapping("/range")
+    @GetMapping("/period")
     @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
-    public ResponseEntity<List<CashClosing>> getCashClosingsByDateRange(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(cashClosingService.getCashClosingsByDateRange(startDate, endDate));
+    public ResponseEntity<List<CashClosing>> getCashClosingsByPeriod(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(cashClosingService.findByPeriod(inicio, fim));
     }
 
-    @GetMapping("/responsible/{responsibleId}")
+    @GetMapping("/pending")
     @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
-    public ResponseEntity<List<CashClosing>> getCashClosingsByResponsible(
-            @PathVariable String responsibleId) {
-        return ResponseEntity.ok(cashClosingService.getCashClosingsByResponsible(responsibleId));
+    public ResponseEntity<List<CashClosing>> getPendingCashClosings() {
+        return ResponseEntity.ok(cashClosingService.findPendingConference());
     }
 
-    @PostMapping("/{id}/receipt")
-    @PreAuthorize("hasAnyRole('CAIXA', 'GERENTE', 'ADMIN')")
-    public ResponseEntity<Void> uploadReceipt(
+    @PutMapping("/{id}/conferir")
+    @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
+    public ResponseEntity<CashClosing> conferirCashClosing(
             @PathVariable String id,
-            @RequestParam("file") MultipartFile file) {
-        cashClosingService.uploadReceipt(id, file);
-        return ResponseEntity.ok().build();
+            Authentication authentication) {
+        return ResponseEntity.ok(cashClosingService.conferirFechamento(id, authentication.getName()));
     }
 
-    @GetMapping(value = "/reports/daily/{date}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping("/user/{userId}/period")
     @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
-    public ResponseEntity<byte[]> generateDailyReport(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=daily-report-" + date + ".xlsx")
-                .body(cashClosingService.generateDailyReport(date));
+    public ResponseEntity<List<CashClosing>> getCashClosingsByUserAndPeriod(
+            @PathVariable String userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(cashClosingService.findByUserIdAndPeriod(userId, inicio, fim));
     }
-
-    @GetMapping(value = "/reports/weekly/{startDate}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
-    public ResponseEntity<byte[]> generateWeeklyReport(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate) {
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=weekly-report-" + startDate + ".xlsx")
-                .body(cashClosingService.generateWeeklyReport(startDate));
-    }
-
-    @GetMapping(value = "/reports/monthly/{month}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
-    public ResponseEntity<byte[]> generateMonthlyReport(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate month) {
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=monthly-report-" + month.getMonth() + ".xlsx")
-                .body(cashClosingService.generateMonthlyReport(month));
-    }
-
-    @PostMapping("/{id}/backup")
-    @PreAuthorize("hasAnyRole('GERENTE', 'ADMIN')")
-    public ResponseEntity<Void> backupToGoogleDrive(@PathVariable String id) {
-        cashClosingService.backupToGoogleDrive(id);
-        return ResponseEntity.ok().build();
-    }
-} 
+}

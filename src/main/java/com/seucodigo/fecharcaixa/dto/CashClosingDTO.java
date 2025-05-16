@@ -1,4 +1,3 @@
-package com.seucodigo.fecharcaixa.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

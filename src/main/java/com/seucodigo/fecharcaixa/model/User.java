@@ -7,25 +7,38 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.List;
 
 @Data
 @Document(collection = "users")
 public class User implements UserDetails {
+    
     @Id
     private String id;
-    private String name;
-    private String email;
+    
+    @NotBlank(message = "Nome é obrigatório")
+    private String nome;
+    
+    @NotBlank(message = "Username é obrigatório")
     private String username;
+    
+    @NotBlank(message = "Email é obrigatório")
+    @Email(message = "Email deve ser válido")
+    private String email;
+    
+    @NotBlank(message = "Senha é obrigatória")
     private String password;
-    private Role role;
-    private boolean active;
+    
+    private String role; // ROLE_ADMIN, ROLE_GERENTE, ROLE_CAIXA
+    
+    private boolean enabled = true;
 
-    public enum Role {
-        ADMIN,
-        GERENTE,
-        CAIXA
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override
@@ -36,11 +49,6 @@ public class User implements UserDetails {
     @Override
     public String getPassword() {
         return password;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
@@ -60,6 +68,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return active;
+        return enabled;
     }
 } 
