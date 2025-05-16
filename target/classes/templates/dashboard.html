@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Dashboard - Sistema de Fechamento de Caixa</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <nav class="sidebar">
+        <div class="user-info">
+          <span th:text="${user.name}">Nome do Usuário</span>
+          <span th:text="${user.role}">Papel</span>
+        </div>
+        <ul class="menu">
+          <li><a th:href="@{/cash-closing}">Fechamento de Caixa</a></li>
+          <li><a th:href="@{/reports}">Relatórios</a></li>
+          <li th:if="${user.role == 'ADMIN'}">
+            <a th:href="@{/users}">Usuários</a>
+          </li>
+        </ul>
+      </nav>
+      <main class="content">
+        <div th:replace="${content}">
+          <!-- Conteúdo dinâmico será inserido aqui -->
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

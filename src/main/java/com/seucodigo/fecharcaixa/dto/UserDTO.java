@@ -1,9 +1,8 @@
 package com.seucodigo.fecharcaixa.dto;
 
-import com.seucodigo.fecharcaixa.model.User;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -20,10 +19,11 @@ public class UserDTO {
     @NotBlank(message = "Username is required")
     private String username;
     
+    @NotBlank(message = "Password is required")
     private String password;
     
     @NotNull(message = "Role is required")
-    private User.Role role;
+    private String role;
     
     private boolean active = true;
 } 

@@ -1,23 +1,65 @@
 package com.seucodigo.fecharcaixa.service;
 
-import com.seucodigo.fecharcaixa.dto.CashClosingDTO;
 import com.seucodigo.fecharcaixa.model.CashClosing;
-import org.springframework.web.multipart.MultipartFile;
+import com.seucodigo.fecharcaixa.repository.CashClosingRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
-public interface CashClosingService {
-    CashClosing createCashClosing(CashClosingDTO cashClosingDTO, String userId);
-    CashClosing updateCashClosing(String id, CashClosingDTO cashClosingDTO);
-    void deleteCashClosing(String id);
-    CashClosing getCashClosingById(String id);
-    List<CashClosing> getCashClosingsByDateRange(LocalDate startDate, LocalDate endDate);
-    List<CashClosing> getCashClosingsByDate(LocalDate date);
-    List<CashClosing> getCashClosingsByResponsible(String responsibleId);
-    void uploadReceipt(String id, MultipartFile file);
-    byte[] generateDailyReport(LocalDate date);
-    byte[] generateWeeklyReport(LocalDate startDate);
-    byte[] generateMonthlyReport(LocalDate month);
-    void backupToGoogleDrive(String cashClosingId);
+@Service
+@RequiredArgsConstructor
+public class CashClosingService {
+
+    private final CashClosingRepository cashClosingRepository;
+
+    public CashClosing createCashClosing(CashClosing cashClosing) {
+        cashClosing.setDataHora(LocalDateTime.now());
+        return cashClosingRepository.save(cashClosing);
+    }
+
+    public CashClosing updateCashClosing(String id, CashClosing cashClosing) {
+        CashClosing existingCashClosing = findById(id);
+        
+        // Não permite alterar dados básicos após criação
+        cashClosing.setId(id);
+        cashClosing.setDataHora(existingCashClosing.getDataHora());
+        cashClosing.setUserId(existingCashClosing.getUserId());
+        
+        return cashClosingRepository.save(cashClosing);
+    }
+
+    public void deleteCashClosing(String id) {
+        cashClosingRepository.deleteById(id);
+    }
+
+    public CashClosing findById(String id) {
+        return cashClosingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Fechamento de caixa não encontrado"));
+    }
+
+    public List<CashClosing> findByUserId(String userId) {
+        return cashClosingRepository.findByUserId(userId);
+    }
+
+    public List<CashClosing> findByPeriod(LocalDateTime inicio, LocalDateTime fim) {
+        return cashClosingRepository.findByDataHoraBetween(inicio, fim);
+    }
+
+    public List<CashClosing> findPendingConference() {
+        return cashClosingRepository.findByConferidoFalse();
+    }
+
+    public CashClosing conferirFechamento(String id, String conferidoPor) {
+        CashClosing cashClosing = findById(id);
+        cashClosing.setConferido(true);
+        cashClosing.setConferidoPor(conferidoPor);
+        cashClosing.setDataConferencia(LocalDateTime.now());
+        return cashClosingRepository.save(cashClosing);
+    }
+
+    public List<CashClosing> findByUserIdAndPeriod(String userId, LocalDateTime inicio, LocalDateTime fim) {
+        return cashClosingRepository.findByUserIdAndDataHoraBetween(userId, inicio, fim);
+    }
 } 

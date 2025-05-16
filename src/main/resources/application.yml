@@ -4,6 +4,9 @@ spring:
       host: localhost
       port: 27017
       database: fechamento_caixa
+      authentication-database: admin
+      # username: admin
+      # password: password
       auto-index-creation: true
 
   servlet:
@@ -14,13 +17,13 @@ spring:
 server:
   port: 8080
   servlet:
-    context-path: /
+    context-path: /api
   error:
     include-message: always
     include-binding-errors: always
 
 jwt:
-  secret: ${JWT_SECRET:your-256-bit-secret-key-here-minimum-32-chars}
+  secret: ${JWT_SECRET:your-256-bit-secret-key-here}
   expiration: 86400000 # 24 hours in milliseconds
 
 google:
@@ -32,5 +35,17 @@ google:
 
 logging:
   level:
-    org.springframework.security: INFO
+    org.springframework.data.mongodb: INFO
+    org.springframework.security: DEBUG
     com.seucodigo.fecharcaixa: DEBUG
+    com.controle.fechamentocaixa: DEBUG
+
+app:
+  backup:
+    google-drive:
+      credentials-file: credentials.json
+      backup-folder-id: your-folder-id-here
+  javafx:
+    title: Sistema de Fechamento de Caixa
+    width: 1024
+    height: 768
