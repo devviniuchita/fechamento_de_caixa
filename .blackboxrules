@@ -136,3 +136,40 @@ Caso falte contexto ou a instrução esteja vaga, responda com:
   3. Terminal SLI (Shell Language Interface) - com espaço antes de cada comando para evitar omissão do primeiro caractere
   4. Interface de chat direta - para comunicação em tempo real com Manus e o usuário
   5. Arquivos .manus/commands/\* - para comandos específicos e formatados
+
+1. SEMPRE validar métodos/dependências antes de editar:
+
+   - Use `grep_search` para confirmar a existência de métodos (e.g., `grep_search("getEmail", "*.java")`).
+   - Se um método não existir, crie-o primeiro ou atualize a classe dependente.
+
+2. Pós-editação:
+
+   - Execute `mvn compile` ou `gradle build` para verificar erros.
+   - Se houver erros, corrija-os antes de continuar.
+
+3. Agrupe edições relacionadas:
+   - Exemplo: Se `Usuario.java` precisa de `setAtivo()`, atualize `UsuarioController.java` na mesma edição.
+
+## 🚀 Boas Práticas de Desenvolvimento (Adicionadas em 2025-05-17)
+
+### 1. Validação de Métodos e Dependências
+
+- **Antes de editar**, sempre verifique se métodos referenciados (e.g., `getEmail()`, `setAtivo()`) existem nas classes dependentes.
+- Use `grep_search` ou `codebase_search` para confirmar a existência dos métodos.
+  - Exemplo: `grep_search("getEmail", "src/main/java/com/controle/fechamentocaixa/**/*.java")`.
+
+### 2. Pós-Edição e Validação
+
+- **Após qualquer edição**, execute `mvn compile` ou `gradle build` para verificar erros de compilação.
+  - Se houver erros, corrija-os imediatamente antes de prosseguir.
+  - Exemplo de comando: `run_terminal_cmd("mvn compile")`.
+
+### 3. Edições em Lote
+
+- Agrupe mudanças relacionadas em uma única operação para evitar inconsistências.
+  - Exemplo: Se `Usuario.java` precisa de `setAtivo()`, atualize `UsuarioController.java` na mesma edição.
+
+### 4. Documentação de Dependências
+
+- Adicione comentários ou um mapa mental no código destacando relações críticas entre classes.
+  - Exemplo: `// Depende de: Usuario.java (métodos: isAdmin(), setAtivo())`.

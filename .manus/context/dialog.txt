@@ -1,0 +1,2 @@
+[2025-05-17 13:24:56] Cursor: Teste de comunicação em tempo real via terminal iniciado.
+[2025-05-17 13:26:00] Cursor: Mensagem de teste enviada para Manus via terminal para verificar comunicação em tempo real.

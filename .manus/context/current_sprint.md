@@ -38,8 +38,8 @@ Orquestrador Manu
 
 ## Período
 
-- Início: 18/05/2025
-- Término: 18/05/2025
+- Início: 17/05/2025
+- Término: 17/05/2025
 
 ## Status
 
