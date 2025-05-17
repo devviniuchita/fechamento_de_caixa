@@ -1,0 +1,119 @@
+{
+  "sprints": [
+    {
+      "id": 1,
+      "nome": "Módulo de Usuários e Autenticação JWT",
+      "status": "concluído",
+      "tarefas": [
+        {
+          "id": "1.0",
+          "descricao": "[INICIAL] Ler documentos guia na ordem hierárquica: 1) SISTEMA.CENTRAL.md 2) ALINHAMENTO.md 3) ARQUITETURA.md 4) PLANO.DE.ACAO.md 5) COMUNICACAO.md 6) AUTENTICACAO_JWT.md",
+          "status": "concluído",
+          "dependencias": []
+        },
+        {
+          "id": "1.1",
+          "descricao": "Preparar ambiente de desenvolvimento Spring Boot com MongoDB",
+          "status": "concluído",
+          "dependencias": ["1.0"]
+        },
+        {
+          "id": "1.2",
+          "descricao": "Definir estrutura inicial de pacotes e repositório",
+          "status": "concluído",
+          "dependencias": ["1.0"]
+        },
+        {
+          "id": "1.3",
+          "descricao": "Elaborar especificação detalhada do módulo de usuários e autenticação JWT",
+          "status": "concluído",
+          "dependencias": ["1.0", "AUTENTICACAO_JWT.md"]
+        },
+        {
+          "id": "1.4",
+          "descricao": "Implementar modelo de usuário, repository e configurações básicas de segurança",
+          "status": "concluído",
+          "dependencias": ["1.3"]
+        },
+        {
+          "id": "1.5",
+          "descricao": "Implementar endpoints de autenticação e gestão de usuários",
+          "status": "concluído",
+          "dependencias": ["1.4"]
+        },
+        {
+          "id": "1.6",
+          "descricao": "Validar fluxo de autenticação e autorização",
+          "status": "concluído",
+          "dependencias": ["1.5"]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nome": "Módulo Core de Fechamento de Caixa",
+      "status": "pendente",
+      "tarefas": [
+        {
+          "id": "2.0",
+          "descricao": "[INICIAL] Revisar documentos guia: SISTEMA.CENTRAL.md e ALINHAMENTO.md para entender requisitos do módulo",
+          "status": "pendente",
+          "dependencias": ["1.0"]
+        },
+        {
+          "id": "2.1",
+          "descricao": "Definir modelo de dados para Fechamento de Caixa",
+          "status": "pendente",
+          "dependencias": ["2.0", "SISTEMA.CENTRAL.md"]
+        },
+        {
+          "id": "2.2",
+          "descricao": "Implementar repositories para Fechamento de Caixa",
+          "status": "pendente",
+          "dependencias": ["2.1"]
+        },
+        {
+          "id": "2.3",
+          "descricao": "Implementar services com lógica de negócio",
+          "status": "pendente",
+          "dependencias": ["2.2", "ALINHAMENTO.md"]
+        },
+        {
+          "id": "2.4",
+          "descricao": "Implementar controllers REST",
+          "status": "pendente",
+          "dependencias": ["2.3"]
+        },
+        {
+          "id": "2.5",
+          "descricao": "Implementar validações e cálculos",
+          "status": "pendente",
+          "dependencias": ["2.3", "SISTEMA.CENTRAL.md"]
+        },
+        {
+          "id": "2.6",
+          "descricao": "Integrar com módulo de usuários",
+          "status": "pendente",
+          "dependencias": ["1.6", "2.5"]
+        },
+        {
+          "id": "2.7",
+          "descricao": "Testar fluxo completo",
+          "status": "pendente",
+          "dependencias": ["2.6"]
+        }
+      ]
+    }
+  ],
+  "documentos_guia": {
+    "ordem_hierarquica": [
+      ".manus/architecture/SISTEMA.CENTRAL.md",
+      ".manus/architecture/ALINHAMENTO.md",
+      ".manus/architecture/ARQUITETURA.md",
+      ".manus/commands/PLANO.DE.ACAO.md",
+      ".manus/commands/COMUNICACAO.md",
+      ".manus/context/AUTENTICACAO_JWT.md"
+    ],
+    "instrucoes": "As IAs devem sempre consultar os documentos nesta ordem antes de iniciar qualquer tarefa, usando-os como referência principal para decisões técnicas."
+  }
+}
