@@ -1,11 +1,13 @@
 package com.controle.fechamentocaixa.security.jwt;
 
 import java.util.Date;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.controle.fechamentocaixa.security.services.UserDetailsImpl;
@@ -80,5 +82,17 @@ public class JwtUtils {
         }
 
         return false;
+    }
+
+    public String generateRefreshToken(UserDetailsImpl userDetails) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);  // 7 days expiration
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .claim("authorities", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, "your-secure-key")  // Use the appropriate secret key
+                .compact();
     }
 } 

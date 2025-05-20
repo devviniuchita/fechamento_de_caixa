@@ -48,4 +48,68 @@ public class Usuario {
     public boolean isAdmin() {
         return perfis.contains(Perfil.ADMIN);
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
+    public Set<Perfil> getPerfis() {
+        return perfis;
+    }
+
+    public void setPerfis(Set<Perfil> perfis) {
+        this.perfis = perfis;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
+    public LocalDateTime getDataUltimoAcesso() {
+        return dataUltimoAcesso;
+    }
+
+    public void setDataUltimoAcesso(LocalDateTime dataUltimoAcesso) {
+        this.dataUltimoAcesso = dataUltimoAcesso;
+    }
 } 

@@ -1,7 +1,6 @@
 package com.controle.fechamentocaixa.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +19,7 @@ import com.controle.fechamentocaixa.exception.ResourceNotFoundException;
 import com.controle.fechamentocaixa.model.Usuario;
 import com.controle.fechamentocaixa.repository.UsuarioRepository;
 import com.controle.fechamentocaixa.security.services.UserDetailsImpl;
+import com.controle.fechamentocaixa.service.UsuarioService;
 
 import jakarta.validation.Valid;
 
@@ -36,6 +36,9 @@ public class UsuarioController {
     @Autowired
     private PasswordEncoder passwordEncoder;
     
+    @Autowired
+    private UsuarioService usuarioService;
+    
     /**
      * Lista todos os usuários
      * 
@@ -44,9 +47,7 @@ public class UsuarioController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE')")
     public List<UsuarioResponse> listarUsuarios() {
-        return usuarioRepository.findAll().stream()
-                .map(this::mapToUsuarioResponse)
-                .collect(Collectors.toList());
+        return usuarioService.listarUsuarios();
     }
     
     /**
@@ -58,10 +59,7 @@ public class UsuarioController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or #id == authentication.principal.id")
     public ResponseEntity<UsuarioResponse> buscarUsuario(@PathVariable String id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + id));
-        
-        return ResponseEntity.ok(mapToUsuarioResponse(usuario));
+        return ResponseEntity.ok(usuarioService.buscarUsuarioPorId(id));
     }
     
     /**
@@ -73,12 +71,7 @@ public class UsuarioController {
     @PatchMapping("/{id}/ativar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> ativarUsuario(@PathVariable String id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + id));
-        
-        usuario.setAtivo(true);
-        usuarioRepository.save(usuario);
-        
+        usuarioService.atualizarStatusAtivacao(id, true);
         return ResponseEntity.ok("Usuário ativado com sucesso!");
     }
     
@@ -99,9 +92,7 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body("Não é possível desativar o último administrador!");
         }
         
-        usuario.setAtivo(false);
-        usuarioRepository.save(usuario);
-        
+        usuarioService.atualizarStatusAtivacao(id, false);
         return ResponseEntity.ok("Usuário desativado com sucesso!");
     }
     
@@ -129,27 +120,6 @@ public class UsuarioController {
         usuarioRepository.save(usuario);
         
         return ResponseEntity.ok("Senha alterada com sucesso!");
-    }
-    
-    /**
-     * Converte entidade Usuario para DTO UsuarioResponse
-     * 
-     * @param usuario Entidade Usuario
-     * @return DTO UsuarioResponse
-     */
-    private UsuarioResponse mapToUsuarioResponse(Usuario usuario) {
-        List<String> perfisStr = usuario.getPerfis().stream()
-                .map(perfil -> perfil.getRole())
-                .collect(Collectors.toList());
-        
-        return UsuarioResponse.builder()
-                .id(usuario.getId())
-                .nome(usuario.getNome())
-                .email(usuario.getEmail())
-                .perfis(perfisStr)
-                .ativo(usuario.isAtivo())
-                .dataCriacao(usuario.getDataCriacao())
-                .build();
     }
     
     /**
