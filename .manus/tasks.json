@@ -1,119 +1,199 @@
 {
+  "memoria_perda_instrucoes": "Se você parou de funcionar ou perdeu memória, execute imediatamente: .manus/scripts/memory-recovery.sh reset",
+  "diretrizes_canais_oficiais": "Todos os agentes (Manus, Cursor, Lingma) DEVEM seguir as orientações dos canais oficiais descritas em canais_oficiais.md e comunicacao_equipes.md. Em caso de perda de memória, estes arquivos devem ser consultados imediatamente para restabelecimento do contexto, automação e comunicação. O uso dos scripts de automação (communication.sh, auto-sync.sh, cursor-command.sh, manus-command.sh, lingma-command.sh, memory-recovery.sh) é obrigatório para todas as operações de comunicação, execução e recuperação.",
+  "auto_recovery": {
+    "check_interval": 300,
+    "enabled": true,
+    "recovery_script": ".manus/scripts/memory-recovery.sh",
+    "recovery_protocol": ".manus/context/memory_recovery_protocol.md",
+    "status_check": ".manus/context/status_sync.json"
+  },
+  "always_check_first": [
+    ".manus/context/canais_oficiais.md",
+    ".manus/context/comunicacao_equipes.md",
+    ".manus/context/memory_recovery_protocol.md",
+    ".manus/context/status_sync.json"
+  ],
+  "project": "Sistema de Fechamento de Caixa",
+  "last_updated": "2024-06-27T14:00:00",
   "sprints": [
     {
-      "id": 1,
-      "nome": "Módulo de Usuários e Autenticação JWT",
-      "status": "concluído",
-      "tarefas": [
-        {
-          "id": "1.0",
-          "descricao": "[INICIAL] Ler documentos guia na ordem hierárquica: 1) SISTEMA.CENTRAL.md 2) ALINHAMENTO.md 3) ARQUITETURA.md 4) PLANO.DE.ACAO.md 5) COMUNICACAO.md 6) AUTENTICACAO_JWT.md",
-          "status": "concluído",
-          "dependencias": []
-        },
+      "id": "1",
+      "name": "Configuração e Autenticação",
+      "status": "EM_ANDAMENTO",
+      "start_date": "2024-06-26",
+      "end_date": "2024-07-03",
+      "tasks": [
         {
           "id": "1.1",
-          "descricao": "Preparar ambiente de desenvolvimento Spring Boot com MongoDB",
-          "status": "concluído",
-          "dependencias": ["1.0"]
+          "name": "Preparar ambiente de desenvolvimento Spring Boot com MongoDB",
+          "description": "Configurar dependências, estrutura de pastas e conexão com banco de dados",
+          "assigned_to": "Cursor",
+          "status": "CONCLUÍDO",
+          "priority": "ALTA",
+          "estimated_hours": 4
         },
         {
           "id": "1.2",
-          "descricao": "Definir estrutura inicial de pacotes e repositório",
-          "status": "concluído",
-          "dependencias": ["1.0"]
+          "name": "Implementar modelo de usuário e repositório",
+          "description": "Criar entidade Usuario, PerfilEnum e UsuarioRepository com métodos necessários",
+          "assigned_to": "Cursor",
+          "status": "EM_ANDAMENTO",
+          "priority": "ALTA",
+          "estimated_hours": 3
         },
         {
           "id": "1.3",
-          "descricao": "Elaborar especificação detalhada do módulo de usuários e autenticação JWT",
-          "status": "concluído",
-          "dependencias": ["1.0", "AUTENTICACAO_JWT.md"]
+          "name": "Configurar autenticação JWT",
+          "description": "Implementar filtros, configurações e classes de segurança JWT",
+          "assigned_to": "Lingma",
+          "status": "EM_ANDAMENTO",
+          "priority": "ALTA",
+          "estimated_hours": 5
         },
         {
           "id": "1.4",
-          "descricao": "Implementar modelo de usuário, repository e configurações básicas de segurança",
-          "status": "concluído",
-          "dependencias": ["1.3"]
+          "name": "Criar endpoints de login e registro",
+          "description": "Implementar AuthController com endpoints para login e registro de usuários",
+          "assigned_to": "Cursor",
+          "status": "PENDENTE",
+          "priority": "ALTA",
+          "estimated_hours": 3
         },
         {
           "id": "1.5",
-          "descricao": "Implementar endpoints de autenticação e gestão de usuários",
-          "status": "concluído",
-          "dependencias": ["1.4"]
+          "name": "Implementar validação e tratamento de exceções",
+          "description": "Criar validadores, handlers de exceções e mensagens de erro padronizadas",
+          "assigned_to": "Lingma",
+          "status": "PENDENTE",
+          "priority": "MÉDIA",
+          "estimated_hours": 4
         },
         {
           "id": "1.6",
-          "descricao": "Validar fluxo de autenticação e autorização",
-          "status": "concluído",
-          "dependencias": ["1.5"]
+          "name": "Testar fluxo de autenticação",
+          "description": "Criar testes unitários e de integração para validar o fluxo completo",
+          "assigned_to": "Lingma",
+          "status": "PENDENTE",
+          "priority": "MÉDIA",
+          "estimated_hours": 3
         }
       ]
     },
     {
-      "id": 2,
-      "nome": "Módulo Core de Fechamento de Caixa",
-      "status": "pendente",
-      "tarefas": [
-        {
-          "id": "2.0",
-          "descricao": "[INICIAL] Revisar documentos guia: SISTEMA.CENTRAL.md e ALINHAMENTO.md para entender requisitos do módulo",
-          "status": "pendente",
-          "dependencias": ["1.0"]
-        },
+      "id": "2",
+      "name": "Módulo de Fechamento de Caixa",
+      "status": "PENDENTE",
+      "start_date": "2024-07-04",
+      "end_date": "2024-07-11",
+      "tasks": [
         {
           "id": "2.1",
-          "descricao": "Definir modelo de dados para Fechamento de Caixa",
-          "status": "pendente",
-          "dependencias": ["2.0", "SISTEMA.CENTRAL.md"]
+          "name": "Modelar entidades de Fechamento de Caixa",
+          "description": "Criar modelos para CashClosing, Receipt, Payment e suas relações",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "ALTA",
+          "estimated_hours": 4
         },
         {
           "id": "2.2",
-          "descricao": "Implementar repositories para Fechamento de Caixa",
-          "status": "pendente",
-          "dependencias": ["2.1"]
+          "name": "Implementar repositórios MongoDB",
+          "description": "Criar repositórios com consultas personalizadas para as entidades",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "ALTA",
+          "estimated_hours": 3
         },
         {
           "id": "2.3",
-          "descricao": "Implementar services com lógica de negócio",
-          "status": "pendente",
-          "dependencias": ["2.2", "ALINHAMENTO.md"]
+          "name": "Desenvolver serviços de negócio",
+          "description": "Implementar regras de negócio e fluxos de fechamento de caixa",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "ALTA",
+          "estimated_hours": 5
         },
         {
           "id": "2.4",
-          "descricao": "Implementar controllers REST",
-          "status": "pendente",
-          "dependencias": ["2.3"]
+          "name": "Criar endpoints REST",
+          "description": "Implementar controllers com endpoints para todas as operações",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "ALTA",
+          "estimated_hours": 4
         },
         {
           "id": "2.5",
-          "descricao": "Implementar validações e cálculos",
-          "status": "pendente",
-          "dependencias": ["2.3", "SISTEMA.CENTRAL.md"]
+          "name": "Implementar validação e regras de negócio",
+          "description": "Adicionar validações, cálculos e regras específicas do domínio",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "MÉDIA",
+          "estimated_hours": 4
         },
         {
           "id": "2.6",
-          "descricao": "Integrar com módulo de usuários",
-          "status": "pendente",
-          "dependencias": ["1.6", "2.5"]
+          "name": "Testar operações de fechamento",
+          "description": "Criar testes unitários e de integração para validar fluxos",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "MÉDIA",
+          "estimated_hours": 4
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Interface e Funcionalidades Adicionais",
+      "status": "PENDENTE",
+      "start_date": "2024-07-12",
+      "end_date": "2024-07-19",
+      "tasks": [
+        {
+          "id": "3.1",
+          "name": "Implementar integração com Google Drive",
+          "description": "Configurar backup automático de dados no Google Drive",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "MÉDIA",
+          "estimated_hours": 5
         },
         {
-          "id": "2.7",
-          "descricao": "Testar fluxo completo",
-          "status": "pendente",
-          "dependencias": ["2.6"]
+          "id": "3.2",
+          "name": "Desenvolver interface web básica",
+          "description": "Criar páginas HTML/CSS/JS para interação com a API",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "MÉDIA",
+          "estimated_hours": 6
+        },
+        {
+          "id": "3.3",
+          "name": "Implementar relatórios e exportação",
+          "description": "Criar endpoints para geração de relatórios em PDF e Excel",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "BAIXA",
+          "estimated_hours": 4
+        },
+        {
+          "id": "3.4",
+          "name": "Adicionar suporte a notificações",
+          "description": "Implementar sistema de notificações por email e interface",
+          "assigned_to": "Unassigned",
+          "status": "PENDENTE",
+          "priority": "BAIXA",
+          "estimated_hours": 3
         }
       ]
     }
   ],
-  "documentos_guia": {
-    "ordem_hierarquica": [
-      ".manus/architecture/SISTEMA.CENTRAL.md",
-      ".manus/architecture/ALINHAMENTO.md",
-      ".manus/architecture/ARQUITETURA.md",
-      ".manus/commands/PLANO.DE.ACAO.md",
-      ".manus/commands/COMUNICACAO.md",
-      ".manus/context/AUTENTICACAO_JWT.md"
-    ],
-    "instrucoes": "As IAs devem sempre consultar os documentos nesta ordem antes de iniciar qualquer tarefa, usando-os como referência principal para decisões técnicas."
+  "current_sprint": "1",
+  "current_task": "1.2",
+  "total_progress": {
+    "completed_tasks": 1,
+    "total_tasks": 16,
+    "percentage": 6.25
   }
 }

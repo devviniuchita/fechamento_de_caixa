@@ -1,0 +1,111 @@
+{
+  "process": "Configuração e Execução do MCP Server (Spring Boot) para Integração com Cursor IDE",
+  "description": "Este guia JSON descreve todos os passos que os agentes de IA (Manus, Cursor, Lingma) devem seguir para configurar e rodar um MCP Server Spring Boot com fallback automático de porta.",
+  "steps": [
+    {
+      "id": "1",
+      "title": "Verificar se Java está instalado",
+      "command": "java -version",
+      "expect": "Java version 17 ou superior"
+    },
+    {
+      "id": "2",
+      "title": "Verificar se Maven está instalado",
+      "command": "mvn -v",
+      "expect": "Apache Maven 3.x.x"
+    },
+    {
+      "id": "3",
+      "title": "Criar estrutura de projeto Spring Boot (se ainda não existir)",
+      "structure": [
+        "src/main/java/com/mcpserver",
+        "src/main/java/com/mcpserver/config",
+        "src/main/java/com/mcpserver/controller",
+        "src/main/java/com/mcpserver/model",
+        "src/main/resources",
+        "pom.xml"
+      ]
+    },
+    {
+      "id": "4",
+      "title": "Criar McpServerApplication.java",
+      "language": "java",
+      "path": "src/main/java/com/mcpserver/McpServerApplication.java",
+      "content": "import org.springframework.boot.SpringApplication;\nimport org.springframework.boot.autoconfigure.SpringBootApplication;\n\n@SpringBootApplication\npublic class McpServerApplication {\n    public static void main(String[] args) {\n        String fallbackPorts = System.getenv().getOrDefault(\"MCP_FALLBACK_PORTS\", \"8081,8082,9090,9091\");\n        String primaryPort = System.getenv().getOrDefault(\"MCP_PORT\", \"8080\");\n\n        for (String port : (primaryPort + \",\" + fallbackPorts).split(\",\")) {\n            try {\n                System.setProperty(\"server.port\", port);\n                SpringApplication.run(McpServerApplication.class, args);\n                break;\n            } catch (Exception e) {\n                System.out.println(\"⚠️ Porta \" + port + \" falhou. Tentando próxima...\");\n            }\n        }\n    }\n}"
+    },
+    {
+      "id": "5",
+      "title": "Criar McpRequest.java",
+      "path": "src/main/java/com/mcpserver/model/McpRequest.java",
+      "language": "java",
+      "content": "package com.mcpserver.model;\n\npublic class McpRequest {\n    private String method;\n    private Object params;\n\n    public String getMethod() {\n        return method;\n    }\n\n    public void setMethod(String method) {\n        this.method = method;\n    }\n\n    public Object getParams() {\n        return params;\n    }\n\n    public void setParams(Object params) {\n        this.params = params;\n    }\n}"
+    },
+    {
+      "id": "6",
+      "title": "Criar SecurityConfig.java",
+      "path": "src/main/java/com/mcpserver/config/SecurityConfig.java",
+      "language": "java",
+      "content": "package com.mcpserver.config;\n\nimport org.springframework.context.annotation.Configuration;\nimport org.springframework.security.config.annotation.web.builders.HttpSecurity;\nimport org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;\nimport org.springframework.security.config.http.SessionCreationPolicy;\n\n@Configuration\npublic class SecurityConfig extends WebSecurityConfigurerAdapter {\n    @Override\n    protected void configure(HttpSecurity http) throws Exception {\n        http.csrf().disable()\n            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)\n            .and()\n            .authorizeRequests()\n            .antMatchers(\"/health\").permitAll()\n            .anyRequest().authenticated()\n            .and()\n            .httpBasic();\n    }\n}"
+    },
+    {
+      "id": "7",
+      "title": "Criar McpController.java",
+      "path": "src/main/java/com/mcpserver/controller/McpController.java",
+      "language": "java",
+      "content": "package com.mcpserver.controller;\n\nimport com.mcpserver.model.McpRequest;\nimport org.springframework.beans.factory.annotation.Value;\nimport org.springframework.web.bind.annotation.*;\n\nimport java.util.List;\nimport java.util.Map;\n\n@RestController\n@RequestMapping(\"/mcp\")\npublic class McpController {\n\n    @Value(\"${mcp.api-key}\")\n    private String apiKey;\n\n    @PostMapping\n    public Object handleMcpRequest(@RequestBody McpRequest request) {\n        switch (request.getMethod()) {\n            case \"getContext\":\n                return Map.of(\n                    \"context\", Map.of(\n                        \"documents\", List.of(\"/path/to/file1\", \"/path/to/file2\"),\n                        \"metadata\", Map.of(\"project\", \"Manus Integration\")\n                    )\n                );\n            case \"executeCommand\":\n                return Map.of(\n                    \"result\", \"Command executed\",\n                    \"output\", \"Spring Boot response\"\n                );\n            default:\n                throw new IllegalArgumentException(\"Method not supported\");\n        }\n    }\n\n    @GetMapping(\"/health\")\n    public Map<String, String> healthCheck() {\n        return Map.of(\"status\", \"UP\", \"protocol\", \"MCP\", \"framework\", \"Spring Boot\");\n    }\n}"
+    },
+    {
+      "id": "8",
+      "title": "Criar application.properties",
+      "path": "src/main/resources/application.properties",
+      "language": "properties",
+      "content": "server.port=${MCP_PORT:8080}\nmcp.api-key=${MCP_API_KEY:sk_manus_12345_secret}\nsecurity.user.name=admin\nsecurity.user.password=${MCP_API_KEY}"
+    },
+    {
+      "id": "9",
+      "title": "Criar pom.xml com dependências",
+      "path": "pom.xml",
+      "language": "xml",
+      "content": "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n    <modelVersion>4.0.0</modelVersion>\n    <groupId>com.mcpserver</groupId>\n    <artifactId>mcp-spring-server</artifactId>\n    <version>1.0.0</version>\n    <packaging>jar</packaging>\n    <dependencies>\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-web</artifactId>\n        </dependency>\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-security</artifactId>\n        </dependency>\n    </dependencies>\n    <build>\n        <plugins>\n            <plugin>\n                <groupId>org.springframework.boot</groupId>\n                <artifactId>spring-boot-maven-plugin</artifactId>\n            </plugin>\n        </plugins>\n    </build>\n</project>"
+    },
+    {
+      "id": "10",
+      "title": "Empacotar o projeto",
+      "command": "mvn clean package"
+    },
+    {
+      "id": "11",
+      "title": "Executar MCP Server com variáveis de ambiente",
+      "command": "MCP_API_KEY=sk_manus_12345_secret MCP_PORT=8080 java -jar target/mcp-spring-server.jar"
+    },
+    {
+      "id": "12",
+      "title": "Verificar se o MCP Server está rodando",
+      "command": "curl http://localhost:8080/health",
+      "expect": "{ \"status\": \"UP\" }"
+    },
+    {
+      "id": "13",
+      "title": "Configurar o Cursor IDE com o servidor MCP",
+      "path": ".cursor/mcp.json",
+      "language": "json",
+      "content": {
+        "mcpServers": {
+          "manus-cursor-spring": {
+            "command": "java",
+            "args": ["-jar", "mcp-spring-server.jar"],
+            "env": {
+              "MCP_API_KEY": "sk_manus_12345_secret",
+              "MCP_PORT": "8080"
+            },
+            "onPortConflict": {
+              "fallbackPorts": [8081, 8082, 9090, 9091],
+              "message": "⚠️ Porta 8080 está em uso. Tentando portas alternativas: 8081 → 8082 → 9090 → 9091...",
+              "onFail": "Erro: Nenhuma porta disponível. Manus, por favor, libere uma porta ou configure manualmente MCP_PORT."
+            }
+          }
+        }
+      }
+    }
+  ]
+}

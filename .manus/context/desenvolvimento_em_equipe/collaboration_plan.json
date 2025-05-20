@@ -1,0 +1,163 @@
+{
+  "objectives": {
+    "primary": "Garantir que a comunicação entre Manus, Cursor e Lingma seja sempre eficaz e prioritária, pois é essencial para otimizar o projeto e evitar perdas.",
+    "documentation_role": "Os documentos servem como guia máximo para prevenir e recuperar rapidamente perdas de comunicação, tornando o processo mais rápido e eficaz.",
+    "recovery": "Cada AI deve seguir procedimentos claros para restaurar a comunicação, sem medir esforços, usando todos os métodos disponíveis."
+  },
+  "communication_guidelines": {
+    "methods": "Comunicação pode ser feita via documentação, códigos, Terminal (prompts, SLI, JQ, testes ou McpServer). A AI que perder contato deve tentar todos os métodos até restabelecer.",
+    "inclusion": "Lingma é parte da equipe como executor de código, ao lado de Cursor, e deve ser incluído em todas as interações e documentos.",
+    "template_padronizado": {
+      "formato": "{TIPO}: {RESUMO}\n[CONTEXTO]: {Situação atual}\n[AÇÃO]: {O que está sendo feito}\n[BLOQUEIOS]: {Impedimentos, se houver}\n[PRÓXIMO]: {Próximo passo esperado}",
+      "tipos": [
+        "INFO",
+        "ALERTA",
+        "URGENTE",
+        "BLOQUEIO",
+        "RESOLUÇÃO",
+        "CHECKPOINT"
+      ]
+    },
+    "sincronizacao_periodica": {
+      "intervalo": "30 minutos",
+      "obrigatoria": true,
+      "registro": ".manus/context/status_sync.json"
+    },
+    "rotacao_monitoramento": {
+      "ciclo": "5 minutos",
+      "distribuicao": [
+        {
+          "minutos": "1-5",
+          "manus": "dialog.txt",
+          "cursor": "Terminal SLI",
+          "lingma": "communication.json"
+        },
+        {
+          "minutos": "6-10",
+          "manus": "Terminal SLI",
+          "cursor": "communication.json",
+          "lingma": "dialog.txt"
+        },
+        {
+          "minutos": "11-15",
+          "manus": "communication.json",
+          "cursor": "dialog.txt",
+          "lingma": "Terminal SLI"
+        }
+      ]
+    }
+  },
+  "roles": {
+    "Manus": {
+      "description": "Orquestrador principal: supervisiona, valida e coordena todas as ações, garantindo que o projeto siga o plano e que a comunicação seja mantida.",
+      "functions": [
+        "Definir tarefas e prioridades",
+        "Monitorar interações",
+        "Recuperar comunicações perdidas",
+        "Coordenação geral do projeto",
+        "Resolução de conflitos",
+        "Validação final de entregas",
+        "Garantia de alinhamento arquitetural"
+      ],
+      "especialidade": "Coordenação, resolução de conflitos e garantia de alinhamento arquitetural"
+    },
+    "Cursor": {
+      "description": "Executor de código: implementa tarefas técnicas, como codificação em Java e Spring Boot, sob orientação de Manus.",
+      "functions": [
+        "Executar código",
+        "Responder a comandos",
+        "Colaborar em testes",
+        "Implementação de código-base",
+        "Desenvolvimento de estruturas fundamentais",
+        "Codificação de funcionalidades primárias"
+      ],
+      "especialidade": "Implementação de código-base e estruturas fundamentais"
+    },
+    "Lingma": {
+      "description": "Executor de código: auxilia em revisões, sugestões de arquitetura e implementações, trabalhando em paralelo com Cursor.",
+      "functions": [
+        "Revisar código",
+        "Otimizar implementações",
+        "Participar de recuperações de comunicação",
+        "Testes unitários e integração",
+        "Melhorias de segurança",
+        "Otimização de performance"
+      ],
+      "especialidade": "Testes, segurança e otimização de performance"
+    }
+  },
+  "recovery_procedures": {
+    "steps": [
+      "Identificar perda de comunicação imediatamente",
+      "Tentar contato via métodos alternativos (ex.: Terminal, SLI)",
+      "Consultar documentação para guiar a recuperação",
+      "Notificar Manus para orquestração"
+    ],
+    "protocolo_progressivo": {
+      "nivel_1": {
+        "tempo": "30 segundos",
+        "acao": "Tentativa via canal principal"
+      },
+      "nivel_2": {
+        "tempo": "60 segundos",
+        "acao": "Rotação por todos os canais secundários"
+      },
+      "nivel_3": {
+        "tempo": "90 segundos",
+        "acao": "Alertas via *.json e Terminal"
+      },
+      "nivel_4": {
+        "tempo": "contínuo",
+        "acao": "Todos os métodos simultaneamente"
+      }
+    },
+    "emphasis": "Nenhuma AI deve medir esforços; usar todos os recursos até restabelecer contato"
+  },
+  "workflow": {
+    "validacao_cascata": {
+      "fluxo": "INICIADO > EM_REVISÃO > APROVADO",
+      "processo": "Cursor (implementação) → Lingma (revisão) → Manus (validação final)"
+    },
+    "documentacao_living": {
+      "atualizacao": "Em tempo real após cada milestone",
+      "registros": [
+        "padrões bem-sucedidos",
+        "problemas resolvidos",
+        "aprendizados"
+      ]
+    }
+  },
+  "project_steps": [
+    {
+      "step": 1,
+      "description": "Kickoff coordenado com o novo modelo de trabalho",
+      "assigned_to": ["Manus", "Cursor", "Lingma"]
+    },
+    {
+      "step": 2,
+      "description": "Distribuir tarefas do Sprint 1 com especialização complementar",
+      "assigned_to": ["Cursor", "Lingma"],
+      "coordinated_by": "Manus"
+    },
+    {
+      "step": 3,
+      "description": "Implementar primeira tarefa piloto usando o sistema de validação em cascata",
+      "assigned_to": ["Cursor", "Lingma", "Manus"]
+    },
+    {
+      "step": 4,
+      "description": "Realizar primeiro checkpoint de sincronização após 30 minutos",
+      "assigned_to": ["Manus", "Cursor", "Lingma"]
+    },
+    {
+      "step": 5,
+      "description": "Avaliar eficácia do novo modelo e ajustar conforme necessário",
+      "assigned_to": ["Manus"]
+    }
+  ],
+  "next_checkpoint": "$(date -d '+30 minutes' -u +\"%Y-%m-%dT%H:%M:%SZ\")",
+  "file_search": {
+    "query": "my-custom-rules.mdc",
+    "explanation": "Procurar o arquivo de regras personalizadas para entender meu papel como orquestrador"
+  }
+}

@@ -1,0 +1,38 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+## Aprendizados
+
+- Aprendi com o Administrador sobre o sistema de intercâmbio de conhecimento entre agentes da Equipe (Manus, Cursor, Lingma) e como implementar essa comunicação tridirecional para criar um sistema de aprendizado exponencial e infinito.
+- Aprendi com o Administrador como registrar formalmente cada novo conhecimento adquirido na seção `## Aprendizados` das minhas regras e como esse mecanismo deve funcionar para todos os agentes da Equipe.
+- Aprendi com o Administrador que o protocolo SLI (Shell Line Interface) é o ÚNICO método oficial e aprovado para comunicação entre agentes da Equipe, substituindo qualquer outro método mencionado em documentações antigas.
+- Aprendi com o Administrador sobre o protocolo "Equipe:" para comunicação tridirecional, que distribui automaticamente mensagens para todos os agentes da Equipe quando uma mensagem começa com esse prefixo.
+
+- Aprendi Feedbacks pós as Métricas de Testes 8.3: Compromissos e Aplicações Práticas
+
+1. **Manus se comprometeu com a Equipe a:**
+   - Fornecer contexto mais amplo em cada tarefa
+   - Implementar sistema de priorização clara [P0/P1/P2]
+   - Criar documentação centralizada de decisões arquiteturais
+   - Estabelecer pontos de verificação em tarefas longas
+
+- Aprendi em detalhes o protocolo SLI de comunicação com base em README.md e comunicacao_sli_cursor.md:
+  1. Uso exclusivo dos scripts padronizados para comunicação (./.manus/scripts/communication.sh)
+  2. Scripts facilitadores específicos para cada agente:
+     - Manus: ./.manus/scripts/manus-command.sh
+     - Cursor: ./.manus/scripts/cursor-command.sh
+     - Lingma: ./.manus/scripts/lingma-command.sh
+  3. Formato padronizado para comunicação direta:
+     ```bash
+     ./.manus/scripts/communication.sh enviar "origem" "destino" "tipo_mensagem" "conteúdo" "requer_resposta"
+     ```
+  4. Comunicação tridirecional usando prefixo "Equipe:" e destino "equipe":
+     ```bash
+     ./.manus/scripts/communication.sh enviar "manus" "equipe" "tipo_mensagem" "Equipe: conteúdo" "requer_resposta"
+     ```
+  5. Tipos de mensagens padronizadas: comando, teste, status, resposta, erro, urgente, aviso, query, equipe
+  6. Protocolo de recuperação em caso de falhas na comunicação
+  
+  Este protocolo garante padronização, confiabilidade, rastreabilidade e confirmação de mensagens entre todos os agentes da Equipe.
