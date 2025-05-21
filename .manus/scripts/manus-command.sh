@@ -14,6 +14,22 @@ send_to_cursor() {
   bash $COMM_SCRIPT enviar "manus" "cursor" "$command_type" "$content" "$requires_response"
 }
 
+# Função para enviar comando para a Equipe (todos os agentes)
+send_to_team() {
+  local command_type=$1
+  local content=$2
+  local requires_response=${3:-true}
+  
+  # Adicionar ao dialog.txt para garantir visibilidade
+  echo "[MANUS] COMUNICAÇÃO TRIDIRECIONAL: Equipe: $content" >> dialog.txt
+  
+  # Enviar para cada agente individualmente
+  bash $COMM_SCRIPT enviar "manus" "cursor" "$command_type" "$content" "$requires_response"
+  bash $COMM_SCRIPT enviar "manus" "lingma" "$command_type" "$content" "$requires_response"
+  
+  echo "Mensagem tridirecional enviada com sucesso para todos os agentes!"
+}
+
 # Função para ler respostas do Cursor
 read_from_cursor() {
   bash $COMM_SCRIPT ler "manus"
@@ -48,6 +64,7 @@ show_help() {
   echo ""
   echo "Comandos:"
   echo "  enviar [tipo] [conteúdo] - Envia comando para Cursor"
+  echo "  equipe [tipo] [conteúdo] - Envia comando para toda a Equipe (comunicação tridirecional)"
   echo "  ler - Lê respostas do Cursor"
   echo "  tarefa [id] - Inicia uma tarefa"
   echo "  sprint [id] - Inicia uma sprint"
@@ -59,6 +76,9 @@ show_help() {
 case "$1" in
   "enviar")
     send_to_cursor "$2" "$3" "$4"
+    ;;
+  "equipe")
+    send_to_team "$2" "$3" "$4"
     ;;
   "ler")
     read_from_cursor
