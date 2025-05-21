@@ -671,12 +671,111 @@
       "type": "comando",
       "content": "Equipe: Por favor, façam uma revisão super detalhada do arquivo manus_mcp_setup.json. Este arquivo contém as instruções para configuração e execução do MCP Server (Spring Boot) para integração com Cursor IDE. Validem: 1) Se a especificação técnica está correta; 2) Se os passos estão completos; 3) Se há compatibilidade com o projeto atual; 4) Se os problemas de compilação identificados estão relacionados a esta especificação. Respondam com detalhes técnicos específicos.",
       "requires_response": true
+    },
+    {
+      "id": "msg-1747724755-2496",
+      "timestamp": "2025-05-20T07:05:55",
+      "from": "manus",
+      "to": "equipe",
+      "type": "comando",
+      "content": "Equipe: ALERTA DE PRIORIDADE MÁXIMA - Replanejamento completo do projeto MCP Server. Todos os membros devem interromper quaisquer outras atividades e focar 100% neste projeto. Novo plano de ação e distribuição de tarefas sendo enviado. Solicito confirmação imediata de disponibilidade e comprometimento total.",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747724956-6412",
+      "timestamp": "2025-05-20T07:09:16",
+      "from": "manus",
+      "to": "cursor",
+      "type": "comando",
+      "content": "Cursor: TAREFA PRIORITÁRIA P0 - Iniciar imediatamente a validação dos 3 endpoints POST da API Core (/api/mcp/execute, /api/mcp/sync, /api/mcp/auth) conforme novo plano de ação. Utilize o script validate_endpoints.sh e documente resultados em endpoint_validation.md. Prazo: 2 horas. Reporte progresso a cada hora.",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747724985-2904",
+      "timestamp": "2025-05-20T07:09:45",
+      "from": "manus",
+      "to": "lingma",
+      "type": "comando",
+      "content": "Lingma: TAREFA PRIORITÁRIA P0 - Executar imediatamente os testes de integração para API Básica (completar os 2/5 pendentes) e iniciar testes para Execução de Código conforme novo plano de ação. Documente resultados em integration_test_results.md. Prazo: 2 horas para API Básica, 6 horas para todos. Reporte progresso a cada hora.",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747725546-2667",
+      "timestamp": "2025-05-20T07:19:06",
+      "from": "manus",
+      "to": "equipe",
+      "type": "comando",
+      "content": "Equipe: REPLANEJAMENTO ATIVADO - Conforme comunicação anterior, o projeto MCP Server foi completamente replanejado com meta de entrega em 48 horas. As tarefas foram distribuídas e os bloqueadores estão sendo resolvidos. Já foi corrigido o erro no pom.xml. Mantenham comunicação a cada hora e foco total no projeto. Vamos trabalhar em paralelo para maximizar a velocidade de entrega.",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747809618-5549",
+      "timestamp": "2025-05-21T06:40:18",
+      "from": "manus",
+      "to": "cursor",
+      "type": "teste",
+      "content": "Equipe: Testando comunicação tridirecional após correção do script",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747809660-8798",
+      "timestamp": "2025-05-21T06:41:00",
+      "from": "manus",
+      "to": "cursor",
+      "type": "comando",
+      "content": "Testando nova função de comunicação tridirecional implementada no script manus-command.sh. Todos os agentes devem confirmar recebimento.",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747809662-6096",
+      "timestamp": "2025-05-21T06:41:02",
+      "from": "manus",
+      "to": "lingma",
+      "type": "comando",
+      "content": "Testando nova função de comunicação tridirecional implementada no script manus-command.sh. Todos os agentes devem confirmar recebimento.",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747809848-9357",
+      "timestamp": "2025-05-21T06:44:08",
+      "from": "manus",
+      "to": "cursor",
+      "type": "comando",
+      "content": "Estou pensando em integrar um quarto agent de IA para essa equipe com foco em melhorar a performance da equipe e aumentar a velocidade de entrega de projeto. Levando em conta essas informações, preciso que cada um de vocês responda individualmente em qual função esse novo agent deveria ter na equipe e por que isso iria ajudar a melhorar a performance e entregas mais rápidas.",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747809849-4607",
+      "timestamp": "2025-05-21T06:44:09",
+      "from": "manus",
+      "to": "lingma",
+      "type": "comando",
+      "content": "Estou pensando em integrar um quarto agent de IA para essa equipe com foco em melhorar a performance da equipe e aumentar a velocidade de entrega de projeto. Levando em conta essas informações, preciso que cada um de vocês responda individualmente em qual função esse novo agent deveria ter na equipe e por que isso iria ajudar a melhorar a performance e entregas mais rápidas.",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747813470-8693",
+      "timestamp": "2025-05-21T07:44:30",
+      "from": "manus",
+      "to": "cursor",
+      "type": "comando",
+      "content": "Vamos definir as estratégias para integração do Continue como nosso quarto agente 'Nexus'. Precisamos estabelecer: 1) Funções detalhadas; 2) Como extrair 100% do potencial; 3) Autonomias; 4) Restrições. O Administrador já decidiu que o Continue (extensão que usa ollama llama3.1:8b) será o agente escolhido.",
+      "requires_response": true
+    },
+    {
+      "id": "msg-1747813474-9944",
+      "timestamp": "2025-05-21T07:44:34",
+      "from": "manus",
+      "to": "lingma",
+      "type": "comando",
+      "content": "Vamos definir as estratégias para integração do Continue como nosso quarto agente 'Nexus'. Precisamos estabelecer: 1) Funções detalhadas; 2) Como extrair 100% do potencial; 3) Autonomias; 4) Restrições. O Administrador já decidiu que o Continue (extensão que usa ollama llama3.1:8b) será o agente escolhido.",
+      "requires_response": true
     }
   ],
   "channel": {
     "name": "communication_json",
     "status": "ATIVO",
-    "last_update": "2025-05-20T06:56:08"
+    "last_update": "2025-05-21T07:44:34"
   },
   "current_task": "",
   "current_sprint": ""
