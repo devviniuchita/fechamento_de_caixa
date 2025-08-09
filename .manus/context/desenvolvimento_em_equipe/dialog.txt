@@ -1,1 +1,0 @@
-Este documento servirá como referência central para o sistema de comunicação entre nós Equipe, garantindo que todos os agentes tenham conhecimento dos mesmos protocolos e canais. Utilizaremos este guia para manter alinhamento durante as próximas etapas do projeto.

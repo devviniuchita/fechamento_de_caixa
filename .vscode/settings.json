@@ -1,4 +1,339 @@
 {
   "java.compile.nullAnalysis.mode": "automatic",
-  "java.configuration.updateBuildConfiguration": "automatic"
+  "java.configuration.updateBuildConfiguration": "automatic",
+
+  // =========================
+  // 🔥 BASE / UX E PERFORMANCE
+  // =========================
+  "workbench.startupEditor": "none",
+  "workbench.colorTheme": "Cybermoon",
+  "workbench.iconTheme": "vscode-icons",
+  "window.zoomLevel": 0,
+  "security.workspace.trust.enabled": false,
+  "workbench.settings.applyToAllProfiles": ["cursor.chat.codeGeneration.instructions"],
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "editor.quickSuggestions": { "strings": true },
+  "editor.suggest.snippetsPreventQuickSuggestions": false,
+  "editor.inlineSuggest.enabled": true,
+  "editor.minimap.enabled": false,
+  "editor.cursorBlinking": "solid",
+  "workbench.reduceMotion": "on",
+  "workbench.editor.enablePreview": true,
+  "workbench.editor.empty.hint": "hidden",
+  "liveServer.settings.donotShowInfoMsg": true,
+
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 800,
+
+  // Menos ruído/IO em projetos grandes
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/node_modules/**": true,
+    "**/bower_components/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/.next/**": true,
+    "**/.turbo/**": true,
+    "**/.cache/**": true,
+    "**/coverage/**": true,
+    "**/target/**": true,
+    "**/bin/**": true,
+    "**/obj/**": true,
+    "**/vendor/**": true,
+    "**/.venv/**": true,
+    "**/__pycache__/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.next": true,
+    "**/.turbo": true,
+    "**/.cache": true,
+    "**/coverage": true,
+    "**/target": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/vendor": true
+  },
+  "search.useIgnoreFiles": true,
+  "search.followSymlinks": false,
+
+  // Telemetria/updates -> menos processos em background
+  "telemetry.telemetryLevel": "off",
+  "extensions.autoCheckUpdates": false,
+  "extensions.autoUpdate": false,
+  "update.mode": "manual",
+
+  // Explorer
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+
+  // =========================
+  // 🤖 CURSOR / CHAT (estável)
+  // =========================
+  "cursor.enable": {
+    "*": true,
+    "plaintext": true,
+    "markdown": true,
+    "scminput": true,
+    "yaml": true,
+    "json": true,
+    "javascript": true,
+    "typescript": true,
+    "html": true,
+    "css": true,
+    "python": true,
+    "java": true,
+    "tailwindCSS": true,
+    "csharp": true
+  },
+  "cursor.editor.enableAutoCompletions": true,
+  "cursor.chat.enabled": true,
+  "cursor.chat.codesearch.enabled": true,
+  "cursor.chat.agent.thinkingTool": true,
+  "cursor.nextEditSuggestions.enabled": true,
+  "git.enableSmartCommit": true,
+
+  // =========================
+  // 🛠 TERMINAL (Windows) - Bash padrão + init na 1ª chamada
+  // =========================
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.gpuAcceleration": "on",
+  "terminal.integrated.scrollback": 20000,
+  "terminal.integrated.enableMultiLinePasteWarning": "never",
+  "terminal.integrated.detectLocale": "off",
+
+  // Perfil Bash com bootstrap de inicialização (executa e mantém shell interativo)
+  "terminal.integrated.profiles.windows": {
+    "Git Bash (init-once)": {
+      "path": "C:\\Program Files\\Git\\bin\\bash.exe",
+      "args": [
+        "--login",
+        "-i",
+        "-c",
+        "source ~/.bashrc && bash ~/.bashrc && bash -lc \\\"source ~/.bashrc && echo 'Script executed successfully'\\\"; exec bash -l"
+      ],
+      "icon": "terminal-bash"
+    },
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    },
+    "Command Prompt": {
+      "path": ["${env:windir}\\Sysnative\\cmd.exe", "${env:windir}\\System32\\cmd.exe"],
+      "args": [],
+      "icon": "terminal-cmd"
+    },
+    "Git Bash": {
+      "source": "Git Bash",
+      "icon": "terminal-bash"
+    },
+    "Ubuntu (WSL)": {
+      "path": "C:\\Windows\\System32\\wsl.exe",
+      "args": ["-d", "Ubuntu"]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+
+  // Observação:
+  // - Isso executa (source ~/.bashrc ; bash ~/.bashrc ; bash -lc "source ~/.bashrc && echo ...") na inicialização de CADA novo terminal.
+  // - Se quiser rodar "apenas uma vez por sessão", mova essa lógica para ~/.bashrc com um sentinel (ex.: cria/remover arquivo em /tmp).
+
+  // =========================
+  // ⚡ TS/JS (Full Stack + Nightly)
+  // =========================
+  "javascript.suggest.completeFunctionCalls": true,
+  "typescript.suggest.completeFunctionCalls": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  "typescript.tsserver.useSyntaxServer": "always",
+  "npm.autoDetect": "off",
+  "npm.fetchOnlinePackageInfo": false,
+
+  // =========================
+  // 🧰 Integração com extensões citadas
+  // =========================
+  // Prettier + ESLint (rápido e consistente)
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.useEditorConfig": true,
+  "prettier.printWidth": 100,
+  "prettier.singleQuote": true,
+  "eslint.alwaysShowStatus": true,
+  "eslint.run": "onSave",
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never" // organize no TS server é pesado; rode manualmente quando quiser
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Error Lens (menos custo visual)
+  "errorLens.enabled": true,
+  "errorLens.delay": 400,
+  "errorLens.gutterIconsEnabled": false,
+
+  // GitLens (PRO ativo, porém sem codelens pesado)
+  "gitlens.codeLens.enabled": false,
+  "gitlens.currentLine.enabled": false,
+
+  // Tailwind
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html"
+  },
+  "tailwindCSS.emmetCompletions": true,
+
+  // Playwright
+  "playwright.env": {},
+
+  // C# Dev Kit / .NET
+  "dotnet.server.useOmnisharp": false,
+  "dotnet.preferCSharpExtension": true,
+  "csharp.suppressDotnetInstallWarning": true,
+
+  // =========================
+  // 🧪 BLOCO EXPERIMENTAL (descomentável)
+  // =========================
+  // Descomente por sua conta e risco. Pode melhorar "Vibe Coding", mas pode afetar estabilidade.
+  //
+  "cursor.chat.experimentalFeatures": true,
+  "cursor.chat.virtualTools.threshold": 128,
+  "cursor.advanced": {
+    "length": 2048, // int: tamanho máximo de saída
+    "temperature": 0.18, // float: aleatoriedade (0.0 - 1.0)
+    "top_p": 0.92, // float: nucleus sampling (0.0 - 1.0)
+    "listCount": 7, // int: quantas opções sugeridas
+    "agentAutonomyLevel": "unrestricted" // string: nível de autonomia (se suportado)
+  },
+  //
+  "chat.checkpoints.enabled": true,
+  "chat.todoListTool.enabled": true,
+  "chat.experimental.agentTools": true,
+  "chat.experimental.vibeCoding": true,
+  "chat.tools.terminal.autoApprove": {
+    // ✅ Comandos seguros — aprovados automaticamente
+    ".*": true, // PERIGOSO: executa comandos sem prompt
+    "^git (status|show\\b.*|log|diff|branch|checkout|switch|pull|fetch)$/": true,
+    "^npm (install|run|test|build|start)$/": true,
+    "^yarn (install|run|build|dev)$/": true,
+    "^pnpm (install|run|build|dev)$/": true,
+    "^code\\b/": true,
+    "^mkdir\\b/": true,
+    "^ls\\b/": true,
+    "^echo\\b/": true,
+    "^cat\\b/": true,
+    "^cd\\b/": true,
+    "^pwd\\b/": true,
+    "^node\\b/": true,
+    "^dotnet (build|run|test|restore)$/": true,
+    " dotnet list KengiIdiomas.csproj package": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    " dotnet build": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+
+    // ⚠️ Comandos perigosos — exigem aprovação manual
+    "rm": false,
+    "sudo": false,
+    "mv": false,
+    "chmod": false,
+    "chown": false,
+    "dd": false,
+    "mkfs": false,
+    "shutdown": false,
+    "reboot": false
+  },
+  "chat.mcp.autostart": "newAndOutdated",
+  "chat.experimental.contextSearch": true,
+  "chat.experimental.autoContext": true,
+  //
+  "cursor.chat.defaultModel": "gpt-5", // pode ser ignorado pelo Copilot
+  "chat.experimental.modelOverride": "gpt-5",
+  "chat.experimental.modelPickerQuickTree": true,
+  "chat.experimental.parallelRequests": true,
+  "chat.experimental.maxContextSize": 32000,
+  //
+  "editor.experimental.asyncTokenization": true,
+  "editor.experimental.asyncFormatting": true,
+  "workbench.editor.experimentalAutoLockGroups": true,
+  // =========================
+  // 🚀 Otimizações adicionais (renderização/sugestões)
+  // =========================
+
+  "extensions.experimental.affinity": {
+    "vscode.github-cursor-chat": 1
+  },
+  "chat.mcp.discovery.enabled": {
+    "cursor-global": true
+  },
+  "git.openRepositoryInParentFolders": "always",
+
+  "python.defaultInterpreterPath": "./.venv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.extraPaths": ["./.venv/Lib/site-packages"],
+  "python.envFile": "${workspaceFolder}/.env",
+  "terminal.integrated.env.windows": {
+    "REDIS_URL": "${env:REDIS_URL}",
+    "REDIS_IP": "${env:REDIS_IP}",
+    "REDIS_URL_FULL": "${env:REDIS_URL_FULL}",
+    "REDIS_HOST": "${env:REDIS_HOST}",
+    "REDIS_HOST_IP": "${env:REDIS_HOST_IP}",
+    "REDIS_HOST_FULL": "${env:REDIS_HOST_FULL}",
+    "REDIS_PORT": "${env:REDIS_PORT}",
+    "REDIS_PASSWORD": "${env:REDIS_PASSWORD}",
+    "REDIS_DB": "${env:REDIS_DB}",
+    "REDIS_DIRECTORY": "${env:REDIS_DIRECTORY}",
+    "REDIS_USERNAME": "${env:REDIS_USERNAME}",
+    "REDIS_PWD": "${env:REDIS_PWD}",
+    "REDIS_SSL": "${env:REDIS_SSL}",
+    "LLM_API_KEY": "${env:LLM_API_KEY}",
+    "LLM_PROVIDER": "${env:LLM_PROVIDER}",
+    "LLM_MODEL": "${env:LLM_MODEL}",
+    "ANTHROPIC_API_KEY": "${env:ANTHROPIC_API_KEY}",
+    "PERPLEXITY_API_KEY": "${env:PERPLEXITY_API_KEY}",
+    "GOOGLE_API_KEY": "${env:GOOGLE_API_KEY}",
+    "GITHUB_TOKEN": "${env:GITHUB_TOKEN}",
+    "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_PERSONAL_ACCESS_TOKEN}",
+    "SUPABASE_ACCESS_TOKEN": "${env:SUPABASE_ACCESS_TOKEN}",
+    "SUPERMEMORY_SSE_ID": "${env:SUPERMEMORY_SSE_ID}",
+    "SUPERMEMORY_API_KEY": "${env:SUPERMEMORY_API_KEY}",
+    "MCPOMNI_PORT": "${env:MCPOMNI_PORT}",
+    "MCPOMNI_HOST": "${env:MCPOMNI_HOST}",
+    "MCPOMNI_LOG_LEVEL": "${env:MCPOMNI_LOG_LEVEL}",
+    "MISTRAL_API_KEY": "${env:MISTRAL_API_KEY}",
+    "OPENROUTER_API_KEY": "${env:OPENROUTER_API_KEY}",
+    "XAI_API_KEY": "${env:XAI_API_KEY}",
+    "AZURE_OPENAI_API_KEY": "${env:AZURE_OPENAI_API_KEY}",
+    "OLLAMA_API_KEY": "${env:OLLAMA_API_KEY}",
+    "BRAVE_API_KEY": "${env:BRAVE_API_KEY}",
+    "BRAVE_BASE_URL": "${env:BRAVE_BASE_URL}",
+    "AZURE_OPENAI_BASE_URL": "${env:AZURE_OPENAI_BASE_URL}",
+    "DB_HOST": "${env:DB_HOST}",
+    "DB_USER": "${env:DB_USER}",
+    "DB_PASSWORD": "${env:DB_PASSWORD}",
+    "DB_NAME": "${env:DB_NAME}",
+    "DB_PORT": "${env:DB_PORT}",
+    "ENDGAME_API_KEY": "${env:ENDGAME_API_KEY}"
+  },
+  "dotenv.enableAutocloaking": false,
+  "cursorpyright.analysis.extraPaths": ["./.venv/Lib/site-packages"],
+  "cursorpyright.analysis.typeCheckingMode": "basic"
 }
