@@ -20,14 +20,14 @@
 - [ ] Adicionar logs detalhados de operações
 - [ ] Implementar cache para consultas frequentes
 
+---
+
 ## Arquitetura
 
 ### Componentes
 
 - API REST (Spring Boot)
-- Banco de dados PostgreSQL
-- Cache Redis (a ser implementado)
-- Frontend React (a ser implementado)
+- Banco de dados MongoDB
 
 ### Fluxo de Dados
 
