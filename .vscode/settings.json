@@ -335,5 +335,37 @@
   },
   "dotenv.enableAutocloaking": false,
   "cursorpyright.analysis.extraPaths": ["./.venv/Lib/site-packages"],
-  "cursorpyright.analysis.typeCheckingMode": "basic"
+  "cursorpyright.analysis.typeCheckingMode": "basic",
+  // =========================
+  // ☕ Java / Spring Boot (Otimizadas)
+  // =========================
+  "java.project.sourcePaths": ["src/main/java"],
+  "java.project.outputPath": "target/classes",
+  "java.import.maven.enabled": true,
+  "java.import.gradle.enabled": false,
+  "java.import.exclusions": ["**/node_modules/**", "**/.git/**", "**/target/**"],
+  "maven.executable.path": "${workspaceFolder}/mvnw.cmd",
+  "maven.terminal.useJavaHome": true,
+  "java.maven.downloadSources": true,
+  "java.maven.downloadJavadoc": true,
+  "java.jdt.ls.vmargs": "-Xms256m -Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication",
+  "java.debug.settings.hotCodeReplace": "auto",
+  "java.debug.settings.console": "integratedTerminal",
+  "java.semanticHighlighting.enabled": true,
+  "spring-boot.ls.enabled": true,
+  "spring-boot.ls.vmargs": "-Xms256m -Xmx1G",
+  "spring-boot.dashboard.hideDisabledProjects": true,
+  // Test Runner (perfil de testes Spring)
+  "java.test.defaultConfig": "spring-test",
+  "java.test.config": {
+    "vmArgs": ["-Dspring.profiles.active=test"]
+  },
+  "java.test.configurations": [
+    {
+      "name": "spring-test",
+      "workingDirectory": "${workspaceFolder}",
+      "vmArgs": ["-Dspring.profiles.active=test"],
+      "args": []
+    }
+  ]
 }

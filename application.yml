@@ -22,25 +22,13 @@ server:
     include-message: always
     include-binding-errors: always
 
-jwt:
-  secret: ${JWT_SECRET:your-256-bit-secret}
-  expiration: ${JWT_EXPIRATION:86400000} # 24 hours
-
-google:
-  drive:
-    credentials-file: ${GOOGLE_DRIVE_CREDENTIALS:classpath:credentials.json}
-    backup-folder-id: ${GOOGLE_DRIVE_BACKUP_FOLDER:}
-    tokens-folder: ${user.home}/.tokens/fechamento-caixa
-    application-name: Fechamento de Caixa
-
-logging:
-  level:
-    root: INFO
-    com.controle.fechamentocaixa: DEBUG
-    org.springframework.data.mongodb: DEBUG
-    org.springframework.security: DEBUG
-
 app:
+  google:
+    drive:
+      credentials-file: ${GOOGLE_DRIVE_CREDENTIALS:classpath:credentials.json}
+      backup-folder-id: ${GOOGLE_DRIVE_BACKUP_FOLDER:}
+      tokens-folder: ${user.home}/.tokens/fechamento-caixa}
+      application-name: Fechamento de Caixa
   backup:
     google-drive:
       credentials-file: credentials.json
@@ -49,3 +37,42 @@ app:
     title: Sistema de Fechamento de Caixa
     width: 1024
     height: 768
+  jwt:
+    secret: ${JWT_SECRET:your-256-bit-secret}
+    expiration: ${JWT_EXPIRATION:86400000} # 24 hours
+
+logging:
+  level:
+    root: INFO
+    '[com.controle.fechamentocaixa]': DEBUG
+    '[org.springframework.data.mongodb]': DEBUG
+    '[org.springframework.security]': DEBUG
+
+---
+# Profile-specific overrides: dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: fechamento_caixa_dev
+      authentication-database: admin
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+server:
+  port: 8081
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    root: INFO
+    '[com.controle.fechamentocaixa]': DEBUG
+    '[org.springframework.data.mongodb]': DEBUG
+    '[org.springframework.security]': DEBUG
