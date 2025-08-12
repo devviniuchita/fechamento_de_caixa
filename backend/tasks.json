@@ -28,7 +28,6 @@
           "id": "1.1",
           "name": "Preparar ambiente de desenvolvimento Spring Boot com MongoDB",
           "description": "Configurar dependências, estrutura de pastas e conexão com banco de dados",
-          "assigned_to": "Cursor",
           "status": "CONCLUÍDO",
           "priority": "ALTA",
           "estimated_hours": 4
@@ -37,7 +36,6 @@
           "id": "1.2",
           "name": "Implementar modelo de usuário e repositório",
           "description": "Criar entidade Usuario, PerfilEnum e UsuarioRepository com métodos necessários",
-          "assigned_to": "Cursor",
           "status": "EM_ANDAMENTO",
           "priority": "ALTA",
           "estimated_hours": 3
@@ -46,7 +44,6 @@
           "id": "1.3",
           "name": "Configurar autenticação JWT",
           "description": "Implementar filtros, configurações e classes de segurança JWT",
-          "assigned_to": "Lingma",
           "status": "EM_ANDAMENTO",
           "priority": "ALTA",
           "estimated_hours": 5
@@ -55,7 +52,6 @@
           "id": "1.4",
           "name": "Criar endpoints de login e registro",
           "description": "Implementar AuthController com endpoints para login e registro de usuários",
-          "assigned_to": "Cursor",
           "status": "PENDENTE",
           "priority": "ALTA",
           "estimated_hours": 3
@@ -64,7 +60,6 @@
           "id": "1.5",
           "name": "Implementar validação e tratamento de exceções",
           "description": "Criar validadores, handlers de exceções e mensagens de erro padronizadas",
-          "assigned_to": "Lingma",
           "status": "PENDENTE",
           "priority": "MÉDIA",
           "estimated_hours": 4
@@ -73,7 +68,6 @@
           "id": "1.6",
           "name": "Testar fluxo de autenticação",
           "description": "Criar testes unitários e de integração para validar o fluxo completo",
-          "assigned_to": "Lingma",
           "status": "PENDENTE",
           "priority": "MÉDIA",
           "estimated_hours": 3
@@ -91,7 +85,6 @@
           "id": "2.1",
           "name": "Modelar entidades de Fechamento de Caixa",
           "description": "Criar modelos para CashClosing, Receipt, Payment e suas relações",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "ALTA",
           "estimated_hours": 4
@@ -100,7 +93,6 @@
           "id": "2.2",
           "name": "Implementar repositórios MongoDB",
           "description": "Criar repositórios com consultas personalizadas para as entidades",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "ALTA",
           "estimated_hours": 3
@@ -109,7 +101,6 @@
           "id": "2.3",
           "name": "Desenvolver serviços de negócio",
           "description": "Implementar regras de negócio e fluxos de fechamento de caixa",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "ALTA",
           "estimated_hours": 5
@@ -118,7 +109,6 @@
           "id": "2.4",
           "name": "Criar endpoints REST",
           "description": "Implementar controllers com endpoints para todas as operações",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "ALTA",
           "estimated_hours": 4
@@ -127,7 +117,6 @@
           "id": "2.5",
           "name": "Implementar validação e regras de negócio",
           "description": "Adicionar validações, cálculos e regras específicas do domínio",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "MÉDIA",
           "estimated_hours": 4
@@ -136,7 +125,6 @@
           "id": "2.6",
           "name": "Testar operações de fechamento",
           "description": "Criar testes unitários e de integração para validar fluxos",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "MÉDIA",
           "estimated_hours": 4
@@ -154,7 +142,6 @@
           "id": "3.1",
           "name": "Implementar integração com Google Drive",
           "description": "Configurar backup automático de dados no Google Drive",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "MÉDIA",
           "estimated_hours": 5
@@ -163,7 +150,6 @@
           "id": "3.2",
           "name": "Desenvolver interface web básica",
           "description": "Criar páginas HTML/CSS/JS para interação com a API",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "MÉDIA",
           "estimated_hours": 6
@@ -172,7 +158,6 @@
           "id": "3.3",
           "name": "Implementar relatórios e exportação",
           "description": "Criar endpoints para geração de relatórios em PDF e Excel",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "BAIXA",
           "estimated_hours": 4
@@ -181,7 +166,6 @@
           "id": "3.4",
           "name": "Adicionar suporte a notificações",
           "description": "Implementar sistema de notificações por email e interface",
-          "assigned_to": "Unassigned",
           "status": "PENDENTE",
           "priority": "BAIXA",
           "estimated_hours": 3

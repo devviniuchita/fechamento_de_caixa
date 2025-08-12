@@ -53,5 +53,5 @@ grep "TAREFA_ATUAL" backend/architecture/ALINHAMENTO.md
 3. Após a conlusão de cada tarefa:
 
 ```bash
-echo "[$(date)] Tarefa X concluída" >> .manus/logs/progresso.log
+echo "[$(date)] Tarefa X concluída" >> backend/logs/progresso.log
 ```
