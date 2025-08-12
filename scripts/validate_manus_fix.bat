@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ====================================
-echo Validação da solução para Manus MCP
+echo Validação da API Fechamento de Caixa
 echo ID do problema: 50e4a31d-3ef9-4c6b-bffc-2b8420a022e1
 echo ====================================
 echo.
@@ -46,7 +46,7 @@ if exist scripts\manus_repair.bat (
 )
 
 echo.
-echo Tentando conectar ao servidor MCP...
+echo Tentando conectar a API Fechamento de Caixa...
 
 REM Tenta conectar ao servidor em várias portas
 set "SERVER_PORT="
@@ -65,17 +65,17 @@ for %%p in (9091 9092 9093 9094 9095 8080 8081 8082) do (
 :server_found
 echo.
 if defined SERVER_PORT (
-    echo Servidor MCP encontrado na porta !SERVER_PORT!
+    echo API encontrada na porta !SERVER_PORT!
     echo Enviando comando de teste...
-    curl -s -X POST -H "Content-Type: application/json" -d "{\"method\":\"getContext\",\"params\":{}}" http://localhost:!SERVER_PORT!/mcp
+    curl -s -I http://localhost:!SERVER_PORT!/api | findstr /C:"HTTP/"
 ) else (
-    echo Servidor MCP não encontrado em nenhuma porta!
+    echo API não encontrada nas portas verificadas!
     echo Tentar iniciar automaticamente? (S/N)
     set /p answer=
     if /i "!answer!"=="s" (
-        echo Iniciando servidor MCP...
-        start /B mvn spring-boot:run > .manus\logs\mcp_server.log 2>&1
-        echo Servidor iniciado em background. Verifique .manus\logs\mcp_server.log
+        echo Iniciando API...
+        start /B mvn spring-boot:run > .manus\logs\api_server.log 2>&1
+        echo Servidor iniciado em background. Verifique .manus\logs\api_server.log
     )
 )
 
@@ -89,7 +89,7 @@ echo Resumo da validação:
 if %CONFIG_ERRORS% EQU 0 if defined SERVER_PORT (
     echo ✅ SOLUÇÃO VALIDADA: O problema 50e4a31d-3ef9-4c6b-bffc-2b8420a022e1 parece estar corrigido!
     echo   - Configurações ajustadas corretamente
-    echo   - Servidor MCP disponível na porta !SERVER_PORT!
+    echo   - API disponível na porta !SERVER_PORT!
     echo   - Arquivos de recuperação criados
     
     REM Registrar solução como bem-sucedida
@@ -98,7 +98,7 @@ if %CONFIG_ERRORS% EQU 0 if defined SERVER_PORT (
 ) else (
     echo ⚠️ SOLUÇÃO PARCIAL: Ainda há itens a serem verificados ou corrigidos:
     echo   - Erros de configuração: %CONFIG_ERRORS%
-    echo   - Servidor MCP disponível: !SERVER_PORT!
+    echo   - API disponível: !SERVER_PORT!
     echo.
     echo Execute 'scripts\manus_repair.bat' para tentar reparar esses problemas.
 )
