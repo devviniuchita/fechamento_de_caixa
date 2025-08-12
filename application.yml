@@ -27,7 +27,7 @@ app:
     drive:
       credentials-file: ${GOOGLE_DRIVE_CREDENTIALS:classpath:credentials.json}
       backup-folder-id: ${GOOGLE_DRIVE_BACKUP_FOLDER:}
-      tokens-folder: ${user.home}/.tokens/fechamento-caixa}
+      tokens-folder: ${user.home}/.tokens/fechamento-caixa
       application-name: Fechamento de Caixa
   backup:
     google-drive:

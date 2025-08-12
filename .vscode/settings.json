@@ -348,23 +348,35 @@
   "maven.terminal.useJavaHome": true,
   "java.maven.downloadSources": true,
   "java.maven.downloadJavadoc": true,
-  "java.jdt.ls.vmargs": "-Xms256m -Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication",
+  "java.jdt.ls.vmargs": "-Xms256m -Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
   "java.debug.settings.hotCodeReplace": "auto",
   "java.debug.settings.console": "integratedTerminal",
   "java.semanticHighlighting.enabled": true,
   "spring-boot.ls.enabled": true,
-  "spring-boot.ls.vmargs": "-Xms256m -Xmx1G",
+  "spring-boot.ls.vmargs": "-Xms256m -Xmx1G --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
   "spring-boot.dashboard.hideDisabledProjects": true,
   // Test Runner (perfil de testes Spring)
   "java.test.defaultConfig": "spring-test",
   "java.test.config": {
-    "vmArgs": ["-Dspring.profiles.active=test"]
+    "vmArgs": [
+      "-Dspring.profiles.active=test",
+      "--add-opens",
+      "java.base/java.lang=ALL-UNNAMED",
+      "--add-opens",
+      "java.base/java.util=ALL-UNNAMED"
+    ]
   },
   "java.test.configurations": [
     {
       "name": "spring-test",
       "workingDirectory": "${workspaceFolder}",
-      "vmArgs": ["-Dspring.profiles.active=test"],
+      "vmArgs": [
+        "-Dspring.profiles.active=test",
+        "--add-opens",
+        "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens",
+        "java.base/java.util=ALL-UNNAMED"
+      ],
       "args": []
     }
   ]

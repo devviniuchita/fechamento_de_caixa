@@ -184,6 +184,8 @@ id_ed25519*
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+.vscode/settings.json
+.vscode/tasks.json
 
 # JetBrains IDEs
 .idea/
@@ -394,6 +396,10 @@ Pag. comunidade.png
 # Especifics
 application.properties
 application.yml
+run-app.bat
+run-dev.cmd
+setup-mongo-user.ps1
+nul
 
 # Todo2 - AI-powered task management directories
 .cursor/rules/todo2-overview.mdc
