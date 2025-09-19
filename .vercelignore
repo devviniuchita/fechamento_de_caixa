@@ -1,0 +1,35 @@
+# Exclude heavy or irrelevant paths from Vercel uploads
+
+# Java/Maven build outputs and sources
+
+/target/
+/src/
+
+# Node deps and build caches
+
+/node_modules/
+/.next/
+/dist/
+/build/
+/out/
+
+# VCS and IDE
+
+/.git/
+/.github/
+/.idea/
+/.vscode/
+/.cursor/
+
+# CI artefacts
+
+/.lighthouseci/
+
+# Misc
+
+.DS_Store
+Thumbs.db
+
+# Keep only static site essentials at repo root and ./public
+
+# The root index.html and ./public/\*_/_ will be uploaded
