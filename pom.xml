@@ -214,6 +214,7 @@
                                 <exclude>.git/**</exclude>
                                 <exclude>.idea/**</exclude>
                                 <exclude>.vscode/**</exclude>
+                                 <exclude>.cursor/**</exclude>
                                 <exclude>**/node_modules/**</exclude>
                             </excludes>
                         </configuration>
