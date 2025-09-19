@@ -523,9 +523,17 @@ PRD.md
 .vscode/ide_config.json
 playground-1.mongodb.js
 
+# GitHub specific files (keep essential workflows, ignore others)
+.github/chatmodes/
+.github/copilot-rules/
+.github/memory-system/
+
 # -----------------------------------
 # GitHub Actions - Force include
-# Garante que workflows sejam versionados
-# mesmo com a regra anterior que ignora .github/
-!.github\workflows\editorconfig-lint.yml
-!.github\workflows\editorconfig-verify.yml
+#! Garante que workflows sejam versionados mesmo com ignore do .github/
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml
+!.github/workflows/*.yaml
+.github/workflows/azure-deploy.yml
+.github/workflows/playwright.yml
