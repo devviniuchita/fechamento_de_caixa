@@ -80,5 +80,5 @@ jobs:
             exit 1
           fi
           vercel pull --yes --environment=production --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID"
-          vercel deploy . --prod --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID"
+          DEPLOY_URL=$(vercel deploy . --prod --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID")
           echo "🚀 Production deployed: $DEPLOY_URL"
