@@ -39,15 +39,15 @@ jobs:
             echo "Vercel secrets ausentes; pulando deploy de preview."
             exit 0
           fi
-          vercel pull --yes --environment=preview --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID"
-          DEPLOY_URL=$(vercel deploy . --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID")
+          vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
+          DEPLOY_URL=$(vercel deploy . --yes --token "$VERCEL_TOKEN")
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
 
       - name: Comentar URL no PR
         if: ${{ steps.deploy.outputs.skip == 'false' && steps.deploy.outputs.url != '' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           PR_NUMBER="${{ github.event.number }}"
           BODY="🚀 Preview Vercel disponível%0A%0A✅ URL: ${{ steps.deploy.outputs.url }}%0A🧩 Commit: ${{ github.sha }}"
@@ -79,6 +79,6 @@ jobs:
             echo "Segredos do Vercel não configurados; não é possível fazer deploy de produção."
             exit 1
           fi
-          vercel pull --yes --environment=production --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID"
-          DEPLOY_URL=$(vercel deploy . --prod --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID")
+          vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
+          DEPLOY_URL=$(vercel deploy . --yes --prod --token "$VERCEL_TOKEN")
           echo "🚀 Production deployed: $DEPLOY_URL"
