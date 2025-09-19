@@ -23,7 +23,8 @@ indent_size = 2
 [*.{json,yml,yaml,md,mdx}]
 indent_style = space
 indent_size = 2
-trim_trailing_whitespace = false  # evita remoção de espaços significativos em Markdown
+# Evita remoção de espaços significativos em Markdown
+trim_trailing_whitespace = false
 
 # Properties (Spring .properties)
 [*.properties]
