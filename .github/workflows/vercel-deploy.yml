@@ -32,13 +32,14 @@ jobs:
         id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+          if [ -z "$VERCEL_TOKEN" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "Vercel secrets ausentes; pulando deploy de preview."
             exit 0
           fi
+          # Link o projeto por nome para evitar necessidade de VERCEL_ORG_ID/PROJECT_ID
+          vercel link --yes --project "fechamento-de-caixa" --token "$VERCEL_TOKEN"
           vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
           DEPLOY_URL=$(vercel deploy . --yes --token "$VERCEL_TOKEN")
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
@@ -73,12 +74,13 @@ jobs:
       - name: Deploy Production to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+          if [ -z "$VERCEL_TOKEN" ]; then
             echo "Segredos do Vercel não configurados; não é possível fazer deploy de produção."
             exit 1
           fi
+          # Link o projeto por nome para evitar necessidade de VERCEL_ORG_ID/PROJECT_ID
+          vercel link --yes --project "fechamento-de-caixa" --token "$VERCEL_TOKEN"
           vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
           DEPLOY_URL=$(vercel deploy . --yes --prod --token "$VERCEL_TOKEN")
           echo "🚀 Production deployed: $DEPLOY_URL"
