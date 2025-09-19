@@ -15,7 +15,7 @@ import com.controle.fechamentocaixa.repository.UsuarioRepository;
  */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    
+
     @Autowired
     private UsuarioRepository usuarioRepository;
 

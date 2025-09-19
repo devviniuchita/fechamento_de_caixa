@@ -29,19 +29,19 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
-    
+
     @Autowired
     private UsuarioRepository usuarioRepository;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     @Autowired
     private UsuarioService usuarioService;
-    
+
     /**
      * Lista todos os usuários
-     * 
+     *
      * @return Lista de usuários
      */
     @GetMapping
@@ -49,10 +49,10 @@ public class UsuarioController {
     public List<UsuarioResponse> listarUsuarios() {
         return usuarioService.listarUsuarios();
     }
-    
+
     /**
      * Busca um usuário pelo ID
-     * 
+     *
      * @param id ID do usuário
      * @return Dados do usuário
      */
@@ -61,10 +61,10 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponse> buscarUsuario(@PathVariable String id) {
         return ResponseEntity.ok(usuarioService.buscarUsuarioPorId(id));
     }
-    
+
     /**
      * Ativa um usuário
-     * 
+     *
      * @param id ID do usuário
      * @return Mensagem de sucesso
      */
@@ -74,10 +74,10 @@ public class UsuarioController {
         usuarioService.atualizarStatusAtivacao(id, true);
         return ResponseEntity.ok("Usuário ativado com sucesso!");
     }
-    
+
     /**
      * Desativa um usuário
-     * 
+     *
      * @param id ID do usuário
      * @return Mensagem de sucesso
      */
@@ -86,19 +86,19 @@ public class UsuarioController {
     public ResponseEntity<?> desativarUsuario(@PathVariable String id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + id));
-        
+
         // Verifica se é o último admin
         if (usuario.isAdmin() && contarAdminsAtivos() <= 1) {
             return ResponseEntity.badRequest().body("Não é possível desativar o último administrador!");
         }
-        
+
         usuarioService.atualizarStatusAtivacao(id, false);
         return ResponseEntity.ok("Usuário desativado com sucesso!");
     }
-    
+
     /**
      * Altera a senha do usuário
-     * 
+     *
      * @param id ID do usuário
      * @param request Requisição com nova senha
      * @return Mensagem de sucesso
@@ -108,23 +108,23 @@ public class UsuarioController {
     public ResponseEntity<?> alterarSenha(@PathVariable String id, @Valid @RequestBody AlteraSenhaRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + id));
-        
+
         // Se não for admin, verifica senha atual
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")) && 
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")) &&
                 !id.equals(userDetails.getId())) {
             return ResponseEntity.badRequest().body("Você não tem permissão para alterar a senha deste usuário!");
         }
-        
+
         usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
         usuarioRepository.save(usuario);
-        
+
         return ResponseEntity.ok("Senha alterada com sucesso!");
     }
-    
+
     /**
      * Conta o número de administradores ativos
-     * 
+     *
      * @return Número de administradores ativos
      */
     private long contarAdminsAtivos() {
@@ -132,19 +132,19 @@ public class UsuarioController {
                 .filter(u -> u.isAtivo() && u.isAdmin())
                 .count();
     }
-    
+
     /**
      * DTO para alteração de senha
      */
     public static class AlteraSenhaRequest {
         private String novaSenha;
-        
+
         public String getNovaSenha() {
             return novaSenha;
         }
-        
+
         public void setNovaSenha(String novaSenha) {
             this.novaSenha = novaSenha;
         }
     }
-} 
+}

@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * Filtro para autorização via token JWT
  */
 public class AuthTokenFilter extends OncePerRequestFilter {
-    
+
     @Autowired
     private JwtUtils jwtUtils;
 
@@ -69,4 +69,4 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         return null;
     }
-} 
+}
