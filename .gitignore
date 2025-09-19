@@ -522,3 +522,10 @@ PRD.md
 .vercel
 .vscode/ide_config.json
 playground-1.mongodb.js
+
+# -----------------------------------
+# GitHub Actions - Force include
+# Garante que workflows sejam versionados
+# mesmo com a regra anterior que ignora .github/
+!.github\workflows\editorconfig-lint.yml
+!.github\workflows\editorconfig-verify.yml

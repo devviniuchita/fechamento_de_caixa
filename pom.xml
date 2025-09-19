@@ -196,6 +196,30 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
+            <!-- Enforce .editorconfig rules in CI and local verify builds -->
+            <plugin>
+                <groupId>org.ec4j.maven</groupId>
+                <artifactId>editorconfig-maven-plugin</artifactId>
+                <version>0.1.1</version>
+                <executions>
+                    <execution>
+                        <id>editorconfig-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>target/**</exclude>
+                                <exclude>.git/**</exclude>
+                                <exclude>.idea/**</exclude>
+                                <exclude>.vscode/**</exclude>
+                                <exclude>**/node_modules/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

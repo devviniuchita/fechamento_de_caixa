@@ -1,0 +1,63 @@
+# EditorConfig: mantém estilos consistentes entre IDEs/editores
+# Referência: https://editorconfig.org
+
+# Arquivo raiz
+root = true
+
+# Padrões globais
+[*]
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+# Indentação padrão do projeto (2) — alinhado ao Google Java Style
+indent_style = space
+indent_size = 2
+
+# Java / Gradle / Maven (mantém 2 espaços)
+[*.{java,gradle,xml}]
+indent_style = space
+indent_size = 2
+
+# JSON / YAML / Markdown / MDX
+[*.{json,yml,yaml,md,mdx}]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false  # evita remoção de espaços significativos em Markdown
+
+# Properties (Spring .properties)
+[*.properties]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+
+# Shell scripts / Bash
+[*.{sh,bash}]
+end_of_line = lf
+indent_style = space
+indent_size = 2
+
+# Windows scripts (CRLF para compatibilidade)
+[*.{bat,cmd}]
+end_of_line = crlf
+indent_style = space
+indent_size = 2
+
+# CSV / TSV (evitar trim automático)
+[*.{csv,tsv}]
+trim_trailing_whitespace = false
+
+# Git config / gitattributes
+[*.{gitconfig,gitattributes}]
+indent_style = space
+indent_size = 2
+
+# Licenças / texto
+[*.{txt,license,licence,LICENSE,NOTICE}]
+indent_style = space
+indent_size = 2
+
+# XML específico do Maven (pom.xml) — 2 espaços (alinhado a settings)
+[pom.xml]
+indent_style = space
+indent_size = 2
