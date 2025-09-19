@@ -14,10 +14,15 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
 
-# Java / Gradle / Maven (mantém 2 espaços)
-[*.{java,gradle,xml}]
+# Java / Gradle (mantém 2 espaços)
+[*.{java,gradle}]
 indent_style = space
 indent_size = 2
+
+# XML (inclui pom.xml) — manter 4 espaços para evitar churn no repositório
+[*.xml]
+indent_style = space
+indent_size = 4
 
 # JSON / YAML / Markdown / MDX
 [*.{json,yml,yaml,md,mdx}]
@@ -58,7 +63,4 @@ indent_size = 2
 indent_style = space
 indent_size = 2
 
-# XML específico do Maven (pom.xml) — 2 espaços (alinhado a settings)
-[pom.xml]
-indent_style = space
-indent_size = 2
+# GitHub Workflows (YAML) já cobertos por bloco YAML; sem regras extras
