@@ -20,10 +20,10 @@ public class UserDetailsImpl implements UserDetails {
     private String id;
     private String email;
     private String nome;
-    
+
     @JsonIgnore
     private String password;
-    
+
     private boolean ativo;
 
     private Collection<? extends GrantedAuthority> authorities;
@@ -40,7 +40,7 @@ public class UserDetailsImpl implements UserDetails {
 
     /**
      * Cria uma instância de UserDetailsImpl a partir de um Usuario
-     * 
+     *
      * @param user Entidade Usuario
      * @return UserDetailsImpl
      */
@@ -70,11 +70,11 @@ public class UserDetailsImpl implements UserDetails {
     public String getEmail() {
         return email;
     }
-    
+
     public String getNome() {
         return nome;
     }
-    
+
     public boolean isAtivo() {
         return ativo;
     }

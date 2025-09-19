@@ -11,30 +11,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/test")
 public class TestController {
-    
+
     /**
      * Endpoint público para teste
-     * 
+     *
      * @return Mensagem de saudação
      */
     @GetMapping("/public")
     public String publicAccess() {
         return "Conteúdo público";
     }
-    
+
     /**
      * Endpoint protegido para qualquer usuário autenticado
-     * 
+     *
      * @return Mensagem de saudação para usuário autenticado
      */
     @GetMapping("/user")
     public String userAccess() {
         return "Conteúdo para usuário autenticado";
     }
-    
+
     /**
      * Endpoint protegido para administradores
-     * 
+     *
      * @return Mensagem de saudação para administrador
      */
     @GetMapping("/admin")
@@ -42,10 +42,10 @@ public class TestController {
     public String adminAccess() {
         return "Conteúdo para administrador";
     }
-    
+
     /**
      * Endpoint protegido para gerentes
-     * 
+     *
      * @return Mensagem de saudação para gerente
      */
     @GetMapping("/gerente")
@@ -53,10 +53,10 @@ public class TestController {
     public String gerenteAccess() {
         return "Conteúdo para gerente";
     }
-    
+
     /**
      * Endpoint protegido para caixas
-     * 
+     *
      * @return Mensagem de saudação para caixa
      */
     @GetMapping("/caixa")
@@ -64,4 +64,4 @@ public class TestController {
     public String caixaAccess() {
         return "Conteúdo para caixa";
     }
-} 
+}

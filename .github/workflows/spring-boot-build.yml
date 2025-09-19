@@ -1,0 +1,50 @@
+name: Spring Boot Build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build Spring Boot Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Run EditorConfig Format
+        run: ./mvnw editorconfig:format
+
+      - name: Compile and Package
+        run: ./mvnw clean compile package -DskipTests
+
+      - name: Run Tests
+        run: ./mvnw test
+
+      - name: Build Summary
+        run: |
+          echo "✅ Spring Boot build completed successfully!"
+          echo "📦 JAR file created:"
+          ls -la target/*.jar || echo "No JAR files found"
+          echo "🔍 Application properties:"
+          cat src/main/resources/application.properties | head -10

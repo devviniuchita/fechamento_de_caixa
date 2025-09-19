@@ -51,7 +51,7 @@ echo Tentando conectar a API Fechamento de Caixa...
 REM Tenta conectar ao servidor em várias portas
 set "SERVER_PORT="
 for %%p in (9091 9092 9093 9094 9095 8080 8081 8082) do (
-    echo -n Verificando porta %%p: 
+    echo -n Verificando porta %%p:
     curl -s http://localhost:%%p/health > nul 2>&1
     if !ERRORLEVEL! EQU 0 (
         echo ✅ Servidor disponível!
@@ -91,7 +91,7 @@ if %CONFIG_ERRORS% EQU 0 if defined SERVER_PORT (
     echo   - Configurações ajustadas corretamente
     echo   - API disponível na porta !SERVER_PORT!
     echo   - Arquivos de recuperação criados
-    
+
     REM Registrar solução como bem-sucedida
     if not exist .manus\solved mkdir .manus\solved
     echo %date% %time%: Problema 50e4a31d-3ef9-4c6b-bffc-2b8420a022e1 resolvido > .manus\solved\50e4a31d.txt

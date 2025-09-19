@@ -26,7 +26,7 @@ import com.controle.fechamentocaixa.security.services.UserDetailsServiceImpl;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    
+
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
@@ -35,7 +35,7 @@ public class SecurityConfig {
 
     /**
      * Configuração do filtro JWT
-     * 
+     *
      * @return Filtro de autenticação JWT
      */
     @Bean
@@ -45,22 +45,22 @@ public class SecurityConfig {
 
     /**
      * Configuração do provedor de autenticação
-     * 
+     *
      * @return Provedor de autenticação DAO
      */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        
+
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-        
+
         return authProvider;
     }
 
     /**
      * Configuração do gerenciador de autenticação
-     * 
+     *
      * @param authConfig Configuração de autenticação
      * @return Gerenciador de autenticação
      * @throws Exception se ocorrer um erro na configuração
@@ -72,7 +72,7 @@ public class SecurityConfig {
 
     /**
      * Configuração do encoder de senha
-     * 
+     *
      * @return BCryptPasswordEncoder
      */
     @Bean
@@ -82,7 +82,7 @@ public class SecurityConfig {
 
     /**
      * Configuração da cadeia de filtros de segurança
-     * 
+     *
      * @param http Configuração HTTP
      * @return Configuração da cadeia de filtros
      * @throws Exception se ocorrer um erro na configuração
@@ -92,16 +92,16 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> 
+            .authorizeHttpRequests(auth ->
                 auth.requestMatchers("/auth/**").permitAll()
                     .requestMatchers("/test/public").permitAll()
                     .requestMatchers("/public/**").permitAll()
                     .anyRequest().authenticated()
             );
-        
+
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
-} 
+}

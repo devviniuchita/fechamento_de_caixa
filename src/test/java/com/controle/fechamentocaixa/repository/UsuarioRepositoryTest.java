@@ -42,7 +42,7 @@ public class UsuarioRepositoryTest {
         usuario.setPerfis(perfis);
         usuario.setAtivo(true);
         usuario.setDataCriacao(LocalDateTime.now());
-        
+
         // Salva o usuário no repositório
         usuario = usuarioRepository.save(usuario);
     }
@@ -78,4 +78,4 @@ public class UsuarioRepositoryTest {
         assertThat(usuarioRepository.existsByEmail("teste@example.com")).isTrue();
         assertThat(usuarioRepository.existsByEmail("inexistente@example.com")).isFalse();
     }
-} 
+}

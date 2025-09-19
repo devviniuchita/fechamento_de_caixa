@@ -15,4 +15,4 @@ public class FechamentoCaixaApplication {
     public static void main(String[] args) {
         SpringApplication.run(FechamentoCaixaApplication.class, args);
     }
-} 
+}
