@@ -1,0 +1,44 @@
+name: EditorConfig Lint (Fast)
+
+on:
+  pull_request:
+    branches: ["**"]
+    paths:
+      - "**/*.java"
+      - "**/*.xml"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.properties"
+      - "**/*.json"
+      - "**/*.md"
+      - "**/*.sh"
+      - "**/*.bash"
+      - "**/*.bat"
+      - "**/*.cmd"
+      - ".editorconfig"
+      - "!target/**"
+      - "!**/node_modules/**"
+
+concurrency:
+  group: editorconfig-lint-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: "maven"
+
+      - name: Make Maven Wrapper executable (Linux)
+        run: chmod +x mvnw
+
+      - name: EditorConfig check (plugin only)
+        run: ./mvnw -B -ntp -q org.ec4j.maven:editorconfig-maven-plugin:0.1.1:check

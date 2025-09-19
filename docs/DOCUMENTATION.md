@@ -1,45 +1,103 @@
-# Sistema de Fechamento de Caixa - Documentação
+# Sistema de Fechamento de Caixa — Documentação
 
-## Tarefas Pendentes
+Esta documentação resume o estado do projeto e referencia o PRD v1.0 (fonte da verdade operacional) localizado em `backend/architecture/PRD.md`.
 
-### Alta Prioridade
+Links úteis:
 
-- [ ] Implementar autenticação JWT para endpoints da API
-- [ ] Criar endpoint para fechamento diário de caixa
-- [ ] Implementar validação de saldo do caixa
+- PRD: `backend/architecture/PRD.md`
+- Arquitetura: `backend/architecture/diagrams/ARQUITETURA.md`
+- Alinhamento: `backend/architecture/diagrams/ALINHAMENTO.md`
+- SPA base: `backend/architecture/diagrams/SISTEMA.CENTRAL.md`
 
-### Média Prioridade
+## Status do Projeto (Set/2025)
 
-- [ ] Documentar API usando Swagger/OpenAPI
-- [ ] Criar testes unitários para operações de caixa
-- [ ] Implementar relatório de movimentações
+O projeto está maduro em segurança e base de dados, com Roadmap claro no PRD para evolução do módulo de Fechamentos.
+
+### Concluído
+
+- ✅ Autenticação JWT (Bearer) com perfis: ADMIN, GERENTE, CAIXA; filtros e entrypoint configurados
+- ✅ Context-path configurado: `/api` (porta padrão 8080; perfis podem usar 8081)
+- ✅ Segurança de configuração: templates `.example` e `AppProperties` para `app.jwt.*`
+- ✅ Base de dados MongoDB: repositórios e auto-index ativado
+- ✅ Remoção de prints de debug: padronizado SLF4J
+- ✅ PRD v1.0 publicado e alinhado ao código (inclui seção 20 — ajustes finos)
+
+## Tarefas Pendentes (alinhadas ao PRD)
+
+### Alta Prioridade — Fase A
+
+- [ ] Implementar Fechamentos: DTOs (`FechamentoRequest`, `FechamentoResponse`), `FechamentoService`, `FechamentoController`
+- [ ] Idempotência diária: endpoint `/api/fechamentos/diario`, método repo por `(usuarioId, data)`, índice `{ usuarioId: 1, data: 1 }`
+- [ ] Endpoint de refresh token: `/api/auth/refresh` (utilitário já existe)
+- [ ] Swagger/OpenAPI: publicar `/swagger-ui` e `/v3/api-docs` (liberar no SecurityConfig)
+- [ ] CORS (se SPA/externo): restringir por origem/métodos
+- [ ] Regras de cálculo com BigDecimal (2 casas) e `ContadorDinheiro` sem doubles
+
+### Média Prioridade — Fases B/C
+
+- [ ] Relatórios (Excel) com Apache POI; PDF opcional (Jasper)
+- [ ] Comprovantes: upload multipart, validação, armazenamento e associação
 
 ### Baixa Prioridade
 
-- [ ] Otimizar queries do banco de dados
-- [ ] Adicionar logs detalhados de operações
-- [ ] Implementar cache para consultas frequentes
+- [ ] Otimizações de consultas (Mongo)
+- [ ] Logs de auditoria mais detalhados
+- [ ] Testes automatizados abrangentes (planejados após Core)
 
----
+## Alerta de Segurança (ação obrigatória)
 
-## Arquitetura
+- Foi identificado um URI do MongoDB Atlas com credenciais em `src/main/resources/application.properties`.
+  - Remover do repositório (substituir por variável/placeholder)
+  - Rotacionar imediatamente a senha do usuário do banco
+  - Usar somente `application.properties.example` + variáveis de ambiente
 
-### Componentes
+## Arquitetura (resumo)
 
-- API REST (Spring Boot)
-- Banco de dados MongoDB
+- Padrão em camadas: Controller → Service → Repository → MongoDB
+- Segurança: Spring Security + JWT (Bearer). Rotas sob `/api`, exceção para `/auth/*`
+- Observabilidade: SLF4J configurado; expandir logs de auditoria em fases futuras
 
-### Fluxo de Dados
+Fluxo típico:
 
-1. Requisição do cliente
-2. Validação de autenticação
-3. Processamento da operação
-4. Persistência no banco
-5. Resposta ao cliente
+1. Requisição com JWT
+2. Filtro valida e popula SecurityContext
+3. Controller chama Service
+4. Service aplica regras do PRD
+5. Repository persiste/consulta
+6. Resposta padronizada
 
-## Requisitos de Segurança
+## Modelos de Dados (resumo)
 
-- Todas as requisições devem ser autenticadas
-- Logs de todas as operações
-- Backup diário do banco de dados
-- Validação de dados em todas as operações
+- Usuario: `id, email (único), nome, senhaHash(BCrypt), perfis[], ativo, dataCriacao, dataUltimoAcesso`
+- FechamentoCaixa: `id, data(LocalDate), responsavel|usuarioId, caixaInicial, vendas, trocoInserido, formasPagamento{...}, despesas[], totais, consistencia, status, observacoes, metadados`
+- Transacao: eventos individuais com `tipo` e `formaPagamento`, campos auxiliares por modalidade
+- Caixa: sessão operacional com totais e status
+- Comprovante: metadados + referência a armazenamento
+
+Detalhes completos no PRD (seção 5).
+
+## Regras de Negócio (resumo)
+
+- Consistência: `abs(delta) <= 0,01`
+- SANGRIA é saída (–), REFORÇO é entrada (+)
+- Estados (API): ABERTO → FECHADO → CONFERIDO. Mapeamento do domínio atual segue PRD 10.2
+- Idempotência diária por `(usuarioId, data)` (ou `responsavel, data`): retornar existente
+
+## Endpoints (resumo — ver PRD seção 7)
+
+- Auth: `POST /api/auth/login`, `POST /api/auth/refresh`
+- Usuários: `GET /api/usuarios`, `GET /api/usuarios/{id}`, `POST /api/usuarios` (ADMIN), `PUT /api/usuarios/{id}`, `PATCH /api/usuarios/{id}/senha`, `PATCH /api/usuarios/{id}/ativar|desativar`
+- Fechamentos: `GET /api/fechamentos`, `GET /api/fechamentos/{id}`, `POST /api/fechamentos`, `PUT /api/fechamentos/{id}`, `PATCH /api/fechamentos/{id}/fechar`, `PATCH /api/fechamentos/{id}/conferir`, `POST /api/fechamentos/{id}/validar`, `POST /api/fechamentos/diario`
+- Comprovantes: `POST /api/comprovantes` (multipart), `GET /api/comprovantes/{id}`
+- Relatórios: `GET /api/relatorios/fechamentos?dataInicio&dataFim&formato=excel|pdf`
+
+## Segurança (boas práticas)
+
+- Todas as rotas (exceto login/registrar, se ativo) exigem Bearer
+- Senhas com BCrypt; sem prints em produção; logs de tentativas de autenticação
+- CORS restrito quando houver cliente externo
+- Segredos somente via env/secrets do ambiente; `.env` nunca commitado
+
+## Observações Finais
+
+- O PRD v1.0 é a referência central para contratos, regras e roadmap. Após cada incremento, atualizar Swagger/OpenAPI e, se necessário, esta documentação.
