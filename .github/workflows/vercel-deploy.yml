@@ -15,9 +15,14 @@ jobs:
     name: Preview (PR)
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
+    env:
+      HAS_VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN != '' || secrets.VERCEL_API_KEY != '' }}
+      HAS_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID != '' }}
+      VERCEL_TOKEN_EFFECTIVE: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_TOKEN || secrets.VERCEL_API_KEY }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      permissions:
+        contents: read
+        pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,20 +33,41 @@ jobs:
           node-version: "20"
 
       - name: Install Vercel CLI
-        if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
-        run: npm i -g vercel@latest
+        if: ${{ env.HAS_VERCEL_TOKEN == 'true' && env.HAS_PROJECT_ID == 'true' }}
+          run: |
+            TOKEN="${{ secrets.VERCEL_TOKEN }}"
+            if [ -z "$TOKEN" ]; then TOKEN="${{ secrets.VERCEL_API_KEY }}"; fi
+            if [ -z "$TOKEN" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+              echo "Skipping Vercel Preview: missing secrets."
+              exit 0
+            fi
+            npm i -g vercel@latest
 
       - name: Pull Vercel Project Settings (preview)
-        if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
-        run: |
-          vercel pull --yes --environment=preview --token "${{ secrets.VERCEL_TOKEN }}"
+        if: ${{ env.HAS_VERCEL_TOKEN == 'true' && env.HAS_PROJECT_ID == 'true' }}
+          run: |
+            TOKEN="${{ secrets.VERCEL_TOKEN }}"
+            if [ -z "$TOKEN" ]; then TOKEN="${{ secrets.VERCEL_API_KEY }}"; fi
+            if [ -z "$TOKEN" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+              echo "Skipping Vercel Preview: missing secrets."
+              exit 0
+            fi
+            vercel pull --yes --environment=preview --token "$TOKEN" --project "${{ secrets.VERCEL_PROJECT_ID }}"
 
       - name: Deploy to Vercel (preview)
-        if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
+        if: ${{ env.HAS_VERCEL_TOKEN == 'true' && env.HAS_PROJECT_ID == 'true' }}
         id: deploy
         run: |
-          DEPLOY_URL=$(vercel deploy . --token "${{ secrets.VERCEL_TOKEN }}")
+          DEPLOY_URL=$(vercel deploy . --token "$VERCEL_TOKEN_EFFECTIVE" --project "$VERCEL_PROJECT_ID")
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+            TOKEN="${{ secrets.VERCEL_TOKEN }}"
+            if [ -z "$TOKEN" ]; then TOKEN="${{ secrets.VERCEL_API_KEY }}"; fi
+            if [ -z "$TOKEN" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+              echo "Skipping Vercel Preview: missing secrets."
+              exit 0
+            fi
+            DEPLOY_URL=$(vercel deploy . --token "$TOKEN" --project "${{ secrets.VERCEL_PROJECT_ID }}")
+            echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
 
       - name: Comment Preview URL on PR
         if: ${{ steps.deploy.outputs.url != '' }}
@@ -57,12 +83,15 @@ jobs:
               body
             });
 
-      - name: Skip info (missing secrets)
-        if: ${{ !(secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '') }}
-        run: |
-          echo "Skipping Vercel Preview: missing secrets."
+        - name: Skip info (always prints when prior steps skipped)
+          run: echo "Preview job finished."
 
   production:
+    env:
+      HAS_VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN != '' || secrets.VERCEL_API_KEY != '' }}
+      HAS_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID != '' }}
+      VERCEL_TOKEN_EFFECTIVE: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_TOKEN || secrets.VERCEL_API_KEY }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     name: Production (main)
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
@@ -79,20 +108,37 @@ jobs:
           node-version: "20"
 
       - name: Install Vercel CLI
-        if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
-        run: npm i -g vercel@latest
+        if: ${{ env.HAS_VERCEL_TOKEN == 'true' && env.HAS_PROJECT_ID == 'true' }}
+          run: |
+            TOKEN="${{ secrets.VERCEL_TOKEN }}"
+            if [ -z "$TOKEN" ]; then TOKEN="${{ secrets.VERCEL_API_KEY }}"; fi
+            if [ -z "$TOKEN" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+              echo "Skipping Vercel Production: missing secrets."
+              exit 0
+            fi
+            npm i -g vercel@latest
 
       - name: Pull Vercel Project Settings (production)
-        if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
-        run: |
-          vercel pull --yes --environment=production --token "${{ secrets.VERCEL_TOKEN }}"
+        if: ${{ env.HAS_VERCEL_TOKEN == 'true' && env.HAS_PROJECT_ID == 'true' }}
+          run: |
+            TOKEN="${{ secrets.VERCEL_TOKEN }}"
+            if [ -z "$TOKEN" ]; then TOKEN="${{ secrets.VERCEL_API_KEY }}"; fi
+            if [ -z "$TOKEN" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+              echo "Skipping Vercel Production: missing secrets."
+              exit 0
+            fi
+            vercel pull --yes --environment=production --token "$TOKEN" --project "${{ secrets.VERCEL_PROJECT_ID }}"
 
       - name: Deploy to Vercel (production)
-        if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
-        run: |
-          vercel deploy . --prod --token "${{ secrets.VERCEL_TOKEN }}"
+        if: ${{ env.HAS_VERCEL_TOKEN == 'true' && env.HAS_PROJECT_ID == 'true' }}
+          run: |
+            TOKEN="${{ secrets.VERCEL_TOKEN }}"
+            if [ -z "$TOKEN" ]; then TOKEN="${{ secrets.VERCEL_API_KEY }}"; fi
+            if [ -z "$TOKEN" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+              echo "Skipping Vercel Production: missing secrets."
+              exit 0
+            fi
+            vercel deploy . --prod --token "$TOKEN" --project "${{ secrets.VERCEL_PROJECT_ID }}"
 
-      - name: Skip info (missing secrets)
-        if: ${{ !(secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '') }}
-        run: |
-          echo "Skipping Vercel Production: missing secrets."
+        - name: Skip info (always prints when prior steps skipped)
+          run: echo "Production job finished."

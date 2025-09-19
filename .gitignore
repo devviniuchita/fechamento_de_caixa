@@ -432,6 +432,7 @@ vite.config.ts.timestamp-*.mjs
 # ------------------
 # Documentation (development only)
 docs/
+!docs/CI-CD-VERCEL.md
 informations/
 sprints/
 
