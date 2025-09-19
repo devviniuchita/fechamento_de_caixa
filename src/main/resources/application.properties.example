@@ -1,0 +1,44 @@
+# Configuração Spring Boot - Template
+# Copie este arquivo para application.properties e configure conforme necessário
+
+
+# MongoDB Configuration
+spring.data.mongodb.host=localhost
+spring.data.mongodb.port=27017
+spring.data.mongodb.database=fechamento_caixa
+spring.data.mongodb.authentication-database=admin
+# spring.data.mongodb.username=admin
+# spring.data.mongodb.password=password
+
+# Para MongoDB Atlas, use URI completa:
+# spring.data.mongodb.uri=mongodb+srv://username:password@cluster.mongodb.net/database
+
+# Server Configuration
+server.port=8080
+server.servlet.context-path=/api
+server.error.include-message=always
+server.error.include-binding-errors=always
+
+# JWT Configuration
+app.jwt.secret=your-256-bit-secret-replace-in-production
+app.jwt.expiration=86400000
+
+# Multipart Configuration
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+# Logging
+logging.level.root=INFO
+logging.level.com.controle.fechamentocaixa=DEBUG
+logging.level.org.springframework.data.mongodb=DEBUG
+logging.level.org.springframework.security=DEBUG
+
+# Google Drive (if needed)
+app.google.drive.credentials-file=classpath:credentials.json
+app.google.drive.tokens-folder=${user.home}/.tokens/fechamento-caixa
+app.google.drive.application-name=Fechamento de Caixa
+
+# JavaFX (if needed)
+app.javafx.title=Sistema de Fechamento de Caixa
+app.javafx.width=1024
+app.javafx.height=768

@@ -1,0 +1,53 @@
+{
+  "$schema": "vscode://schemas/tasks",
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "mvnw spring-boot:run (prod)",
+      "type": "shell",
+      "command": "./mvnw",
+      "windows": { "command": ".\\mvnw.cmd" },
+      "args": [
+        "spring-boot:run",
+        "-Dspring-boot.run.profiles=prod",
+        "-Dspring-boot.run.jvmArguments=-Dserver.port=8081 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "mvnw spring-boot:run (dev)",
+      "type": "shell",
+      "command": "./mvnw",
+      "windows": { "command": ".\\mvnw.cmd" },
+      "args": [
+        "spring-boot:run",
+        "-Dspring-boot.run.profiles=dev",
+        "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=6648 -Dcom.sun.management.jmxremote.rmi.port=6648 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1 -Dserver.port=8081 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "mvnw test (test profile)",
+      "type": "shell",
+      "command": "./mvnw",
+      "windows": { "command": ".\\mvnw.cmd" },
+      "args": ["-Dspring.profiles.active=test", "test"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

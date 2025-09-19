@@ -44,9 +44,9 @@ public class JwtUtils {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .subject(userPrincipal.getUsername())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -87,10 +87,10 @@ public class JwtUtils {
         String jwtSecret = appProperties.getJwt().getSecret();
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
+                .subject(userDetails.getUsername())
                 .claim("authorities", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+                .issuedAt(now)
+                .expiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

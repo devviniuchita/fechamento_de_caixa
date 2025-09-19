@@ -1,6 +1,5 @@
 package com.controle.fechamentocaixa.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import com.controle.fechamentocaixa.dto.LoginRequest;
 import com.controle.fechamentocaixa.dto.LoginResponse;
 import com.controle.fechamentocaixa.dto.RegistroUsuarioRequest;
 import com.controle.fechamentocaixa.dto.UsuarioResponse;
-import com.controle.fechamentocaixa.model.Perfil;
 import com.controle.fechamentocaixa.repository.UsuarioRepository;
 import com.controle.fechamentocaixa.security.jwt.JwtUtils;
 import com.controle.fechamentocaixa.security.services.UserDetailsImpl;
@@ -32,7 +30,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -41,13 +39,13 @@ public class AuthController {
 
     @Autowired
     private JwtUtils jwtUtils;
-    
+
     @Autowired
     private UsuarioService usuarioService;
 
     /**
      * Endpoint para autenticar um usuário
-     * 
+     *
      * @param loginRequest DTO com credenciais de login
      * @return ResponseEntity com token JWT e informações do usuário
      */
@@ -58,12 +56,12 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
-        
+
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .toList();
-        
+
         // Registra o acesso do usuário
         usuarioService.registrarAcesso(userDetails.getEmail());
 
@@ -73,13 +71,13 @@ public class AuthController {
         response.setEmail(userDetails.getEmail());
         response.setNome(userDetails.getNome());
         response.setPerfis(roles);
-        
+
         return ResponseEntity.ok(response);
     }
 
     /**
      * Endpoint para registrar um novo usuário
-     * 
+     *
      * @param registroRequest DTO com dados do novo usuário
      * @return ResponseEntity com mensagem de sucesso
      */
@@ -94,11 +92,11 @@ public class AuthController {
                     registroRequest.getPerfis().add("ADMIN");
                 }
             }
-            
+
             UsuarioResponse usuarioResponse = usuarioService.registrarUsuario(registroRequest);
             return ResponseEntity.ok(usuarioResponse);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-} 
+}

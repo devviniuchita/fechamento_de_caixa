@@ -1,0 +1,32 @@
+{
+  "$schema": "vscode://schemas/launch",
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Spring Boot (MainClass, dev)",
+      "request": "launch",
+      "mainClass": "com.controle.fechamentocaixa.FechamentoCaixaApplication",
+      "vmArgs": "-Dspring.profiles.active=dev -Dserver.port=8081 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "java",
+      "name": "Attach to Spring Boot (5005)",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-FechamentoCaixaApplication<mcpserver-standalone>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.controle.fechamentocaixa.FechamentoCaixaApplication",
+      "projectName": "mcpserver-standalone",
+      "args": "",
+      "vmArgs": "-Dserver.port=8081 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
