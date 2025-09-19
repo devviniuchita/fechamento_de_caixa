@@ -538,3 +538,5 @@ playground-1.mongodb.js
 !.github/workflows/*.yaml
 .github/workflows/azure-deploy.yml
 .github/workflows/playwright.yml
+.vercel
+!docs/ci-vercel-check.md
