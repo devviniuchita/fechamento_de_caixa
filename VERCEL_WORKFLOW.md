@@ -1,57 +1,57 @@
-# 🚀 Vercel CI/CD Workflow Documentation
+# 🚀 Documentação do Workflow CI/CD Vercel
 
 [![Deploy to Vercel](https://img.shields.io/badge/Deploy%20to%20Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
 [![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/features/actions)
 [![CI/CD](https://img.shields.io/badge/CI/CD-Active-success?style=for-the-badge)](https://github.com/devviniuchita/fechamento_de_caixa/actions)
 
-> **Professional CI/CD Implementation** - Automated deployment workflow for production-ready applications using GitHub Actions and Vercel CLI integration.
+> **Implementação Profissional de CI/CD** - Workflow de deploy automatizado para aplicações prontas para produção usando integração entre GitHub Actions e Vercel CLI.
 
 ---
 
-## 📋 Table of Contents
+## 📋 Índice
 
-- [🎯 Overview](#-overview)
-- [🏗️ Architecture](#️-architecture)
-- [⚡ Features](#-features)
-- [🔧 Setup & Configuration](#-setup--configuration)
-- [🚦 Workflow Execution](#-workflow-execution)
-- [📊 Monitoring & Validation](#-monitoring--validation)
-- [🛠️ Troubleshooting](#️-troubleshooting)
-- [📚 Best Practices](#-best-practices)
-- [🔗 Additional Resources](#-additional-resources)
+- [🎯 Visão Geral](#-visão-geral)
+- [🏗️ Arquitetura](#️-arquitetura)
+- [⚡ Funcionalidades](#-funcionalidades)
+- [🔧 Configuração e Setup](#-configuração-e-setup)
+- [🚦 Execução do Workflow](#-execução-do-workflow)
+- [📊 Monitoramento e Validação](#-monitoramento-e-validação)
+- [🛠️ Solução de Problemas](#️-solução-de-problemas)
+- [📚 Melhores Práticas](#-melhores-práticas)
+- [🔗 Recursos Adicionais](#-recursos-adicionais)
 
 ---
 
-## 🎯 Overview
+## 🎯 Visão Geral
 
-This repository implements a **production-grade CI/CD workflow** that automates the deployment process to Vercel using GitHub Actions. The workflow demonstrates industry-standard DevOps practices including:
+Este repositório implementa um **workflow de CI/CD de nível profissional** que automatiza o processo de deploy para Vercel usando GitHub Actions. O workflow demonstra práticas DevOps padrão da indústria incluindo:
 
-- **Automated Preview Deployments** for Pull Requests
-- **Production Deployments** on main branch merges
-- **Secure Secret Management** with GitHub Secrets
-- **Automated PR Comments** with deployment URLs
-- **Error Handling & Rollback Capabilities**
+- **Deploys de Preview Automatizados** para Pull Requests
+- **Deploys de Produção** em merges na branch main
+- **Gerenciamento Seguro de Secrets** com GitHub Secrets
+- **Comentários Automatizados em PR** com URLs de deploy
+- **Tratamento de Erros e Capacidades de Rollback**
 
-### 🎨 Workflow Diagram
+### 🎨 Diagrama do Workflow
 
 ```mermaid
 graph TD
-    A[Developer Push/PR] --> B{Event Type}
-    B -->|Pull Request| C[Preview Workflow]
-    B -->|Push to Main| D[Production Workflow]
-    
-    C --> E[Setup Environment]
-    E --> F[Install Vercel CLI]
-    F --> G[Link Project]
+    A[Push/PR do Desenvolvedor] --> B{Tipo de Evento}
+    B -->|Pull Request| C[Workflow Preview]
+    B -->|Push para Main| D[Workflow Produção]
+
+    C --> E[Configurar Ambiente]
+    E --> F[Instalar Vercel CLI]
+    F --> G[Vincular Projeto]
     G --> H[Deploy Preview]
-    H --> I[Comment PR with URL]
-    
-    D --> J[Setup Environment]
-    J --> K[Install Vercel CLI]
-    K --> L[Link Project]
-    L --> M[Deploy Production]
-    M --> N[Update Live Site]
-    
+    H --> I[Comentar PR com URL]
+
+    D --> J[Configurar Ambiente]
+    J --> K[Instalar Vercel CLI]
+    K --> L[Vincular Projeto]
+    L --> M[Deploy Produção]
+    M --> N[Atualizar Site Live]
+
     style C fill:#e1f5fe
     style D fill:#f3e5f5
     style H fill:#c8e6c9
@@ -60,323 +60,334 @@ graph TD
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Arquitetura
 
-### 📁 File Structure
+### 📁 Estrutura de Arquivos
 
 ```
 .github/
 └── workflows/
-    └── vercel-deploy.yml    # Main CI/CD workflow configuration
+    └── vercel-deploy.yml    # Configuração principal do workflow CI/CD
 docs/
-└── CI-CD-VERCEL.md        # Detailed setup guide
-.env.example               # Environment variables template
+└── CI-CD-VERCEL.md        # Guia detalhado de configuração
+.env.example               # Template de variáveis de ambiente
 ```
 
-### 🔄 Workflow Components
+### 🔄 Componentes do Workflow
 
-| Component | Purpose | Trigger |
-|-----------|---------|---------|
-| **Preview Job** | Creates preview deployments for code review | Pull Request to `main` |
-| **Production Job** | Deploys to production environment | Push to `main` branch |
-| **Auto-commenting** | Posts deployment URLs to PR discussions | Successful preview deployment |
+| Componente          | Propósito                                      | Trigger                        |
+| ------------------- | ---------------------------------------------- | ------------------------------ |
+| **Job Preview**     | Cria deploys de preview para revisão de código | Pull Request para `main`       |
+| **Job Produção**    | Faz deploy para ambiente de produção           | Push para branch `main`        |
+| **Auto-comentário** | Posta URLs de deploy nas discussões do PR      | Deploy de preview bem-sucedido |
 
 ---
 
-## ⚡ Features
+## ⚡ Funcionalidades
 
-### 🎯 **Automated Deployment Pipeline**
-- ✅ **Zero-downtime deployments** with Vercel's edge network
-- ✅ **Automatic rollback** on deployment failures
-- ✅ **Environment-specific** configurations (preview/production)
+### 🎯 **Pipeline de Deploy Automatizado**
 
-### 🔐 **Security & Best Practices**
-- ✅ **Encrypted secrets** management via GitHub Secrets
-- ✅ **Principle of least privilege** with minimal required permissions
-- ✅ **Secure token handling** without exposure in logs
+- ✅ **Deploys sem downtime** com a rede edge da Vercel
+- ✅ **Rollback automático** em caso de falhas no deploy
+- ✅ **Configurações específicas por ambiente** (preview/produção)
 
-### 📊 **Monitoring & Feedback**
-- ✅ **Real-time deployment status** in GitHub Actions UI
-- ✅ **Automated PR commenting** with preview URLs
-- ✅ **Detailed logging** for debugging and audit trails
+### 🔐 **Segurança e Melhores Práticas**
 
-### 🚦 **Quality Gates**
-- ✅ **Pre-deployment validation** with environment checks
-- ✅ **Graceful failure handling** with informative error messages
-- ✅ **Concurrency control** to prevent conflicting deployments
+- ✅ **Gerenciamento de secrets criptografados** via GitHub Secrets
+- ✅ **Princípio de menor privilégio** com permissões mínimas necessárias
+- ✅ **Manuseio seguro de tokens** sem exposição em logs
+
+### 📊 **Monitoramento e Feedback**
+
+- ✅ **Status de deploy em tempo real** na interface do GitHub Actions
+- ✅ **Comentários automatizados em PR** com URLs de preview
+- ✅ **Logging detalhado** para debugging e trilhas de auditoria
+
+### 🚦 **Portões de Qualidade**
+
+- ✅ **Validação pré-deploy** com verificações de ambiente
+- ✅ **Tratamento gracioso de falhas** com mensagens de erro informativas
+- ✅ **Controle de concorrência** para prevenir deploys conflitantes
 
 ---
 
-## 🔧 Setup & Configuration
+## 🔧 Configuração e Setup
 
-### 📋 Prerequisites
+### 📋 Pré-requisitos
 
-- GitHub repository with admin access
-- Vercel account with deployment permissions
-- Node.js project ready for deployment
+- Repositório GitHub com acesso de administrador
+- Conta Vercel com permissões de deploy
+- Projeto Node.js pronto para deploy
 
-### 🔑 Required Secrets
+### 🔑 Secrets Necessários
 
-Configure these secrets in your GitHub repository (`Settings` → `Secrets and variables` → `Actions`):
+Configure estes secrets no seu repositório GitHub (`Settings` → `Secrets and variables` → `Actions`):
 
-| Secret Name | Description | Example |
-|-------------|-------------|---------|
-| `VERCEL_TOKEN` | Vercel authentication token | `abc123...` |
+| Nome do Secret | Descrição                       | Exemplo     |
+| -------------- | ------------------------------- | ----------- |
+| `VERCEL_TOKEN` | Token de autenticação da Vercel | `abc123...` |
 
-### 📝 Step-by-Step Setup
+### 📝 Setup Passo a Passo
 
-#### 1️⃣ **Generate Vercel Token**
-
-```bash
-# Visit Vercel Dashboard
-# Navigate to Settings → Tokens
-# Create new token with deployment permissions
-# Copy the generated token
-```
-
-#### 2️⃣ **Configure GitHub Secrets**
+#### 1️⃣ **Gerar Token da Vercel**
 
 ```bash
-# In your GitHub repository:
-# 1. Go to Settings → Secrets and variables → Actions
-# 2. Click "New repository secret"
-# 3. Name: VERCEL_TOKEN
-# 4. Value: [paste your token]
-# 5. Click "Add secret"
+# Visite o Dashboard da Vercel
+# Navegue para Settings → Tokens
+# Crie um novo token com permissões de deploy
+# Copie o token gerado
 ```
 
-#### 3️⃣ **Link Vercel Project**
+#### 2️⃣ **Configurar GitHub Secrets**
 
-The workflow automatically links to your Vercel project using the repository name. Ensure your Vercel project matches your repository name or update the workflow file:
+```bash
+# No seu repositório GitHub:
+# 1. Vá para Settings → Secrets and variables → Actions
+# 2. Clique em "New repository secret"
+# 3. Nome: VERCEL_TOKEN
+# 4. Valor: [cole seu token]
+# 5. Clique em "Add secret"
+```
+
+#### 3️⃣ **Vincular Projeto Vercel**
+
+O workflow automaticamente vincula ao seu projeto Vercel usando o nome do repositório. Certifique-se que seu projeto Vercel corresponde ao nome do repositório ou atualize o arquivo de workflow:
 
 ```yaml
-# In .github/workflows/vercel-deploy.yml
-vercel link --yes --project "your-project-name" --token "$VERCEL_TOKEN"
+# Em .github/workflows/vercel-deploy.yml
+vercel link --yes --project "nome-do-seu-projeto" --token "$VERCEL_TOKEN"
 ```
 
 ---
 
-## 🚦 Workflow Execution
+## 🚦 Execução do Workflow
 
-### 🔄 **Automatic Triggers**
+### 🔄 **Triggers Automáticos**
 
-| Event | Workflow | Environment | Action |
-|-------|----------|-------------|--------|
-| PR opened/updated | Preview | `preview` | Deploy → Comment URL |
-| Push to `main` | Production | `production` | Deploy → Update live site |
+| Evento               | Workflow | Ambiente     | Ação                         |
+| -------------------- | -------- | ------------ | ---------------------------- |
+| PR aberto/atualizado | Preview  | `preview`    | Deploy → Comentar URL        |
+| Push para `main`     | Produção | `production` | Deploy → Atualizar site live |
 
-### 📱 **Manual Triggers**
+### 📱 **Triggers Manuais**
 
-You can also trigger deployments manually using GitHub CLI:
+Você também pode disparar deploys manualmente usando GitHub CLI:
 
 ```bash
-# Trigger workflow manually
+# Disparar workflow manualmente
 gh workflow run "Deploy to Vercel" --ref main
 ```
 
-### 🎯 **Workflow Steps Breakdown**
+### 🎯 **Detalhamento dos Passos do Workflow**
 
-#### **Preview Deployment (Pull Request)**
+#### **Deploy de Preview (Pull Request)**
 
 ```yaml
-1. 🏗️  Setup Ubuntu runner environment
-2. 📂  Checkout code from PR branch
-3. ⚙️   Install Node.js 20
-4. 📦  Install Vercel CLI globally
-5. 🔗  Link project to Vercel
-6. 📥  Pull environment configuration
-7. 🚀  Deploy to preview environment
-8. 💬  Comment deployment URL on PR
+1. 🏗️  Configurar ambiente Ubuntu runner
+2. 📂  Fazer checkout do código da branch PR
+3. ⚙️   Instalar Node.js 20
+4. 📦  Instalar Vercel CLI globalmente
+5. 🔗  Vincular projeto à Vercel
+6. 📥  Puxar configuração de ambiente
+7. 🚀  Fazer deploy para ambiente de preview
+8. 💬  Comentar URL de deploy no PR
 ```
 
-#### **Production Deployment (Main Branch)**
+#### **Deploy de Produção (Branch Main)**
 
 ```yaml
-1. 🏗️  Setup Ubuntu runner environment  
-2. 📂  Checkout code from main branch
-3. ⚙️   Install Node.js 20
-4. 📦  Install Vercel CLI globally
-5. 🔗  Link project to Vercel
-6. 📥  Pull production configuration
-7. 🚀  Deploy to production with --prod flag
-8. ✅  Log deployment success
+1. 🏗️  Configurar ambiente Ubuntu runner
+2. 📂  Fazer checkout do código da branch main
+3. ⚙️   Instalar Node.js 20
+4. 📦  Instalar Vercel CLI globalmente
+5. 🔗  Vincular projeto à Vercel
+6. 📥  Puxar configuração de produção
+7. 🚀  Fazer deploy para produção com flag --prod
+8. ✅  Registrar sucesso do deploy
 ```
 
 ---
 
-## 📊 Monitoring & Validation
+## 📊 Monitoramento e Validação
 
-### 🔍 **Real-time Monitoring**
+### 🔍 **Monitoramento em Tempo Real**
 
-Access deployment status through multiple channels:
+Acesse o status dos deploys através de múltiplos canais:
 
 ```bash
-# GitHub CLI - Monitor workflow runs
+# GitHub CLI - Monitorar execuções do workflow
 gh run list --workflow="Deploy to Vercel"
 
-# GitHub CLI - Watch specific run
+# GitHub CLI - Assistir execução específica
 gh run watch [RUN_ID] --exit-status
 
-# GitHub CLI - View detailed logs
+# GitHub CLI - Ver logs detalhados
 gh run view [RUN_ID] --log
 ```
 
-### 📈 **Success Indicators**
+### 📈 **Indicadores de Sucesso**
 
-- ✅ **Green checkmark** in GitHub Actions UI
-- ✅ **Deployment URL** commented on PR
-- ✅ **Live site** accessible and updated
-- ✅ **Vercel dashboard** shows successful deployment
+- ✅ **Check verde** na interface do GitHub Actions
+- ✅ **URL de deploy** comentada no PR
+- ✅ **Site live** acessível e atualizado
+- ✅ **Dashboard da Vercel** mostra deploy bem-sucedido
 
-### 🔴 **Failure Indicators**
+### 🔴 **Indicadores de Falha**
 
-- ❌ **Red X** in GitHub Actions UI
-- ❌ **Error messages** in workflow logs
-- ❌ **Previous version** remains live (automatic rollback)
+- ❌ **X vermelho** na interface do GitHub Actions
+- ❌ **Mensagens de erro** nos logs do workflow
+- ❌ **Versão anterior** permanece live (rollback automático)
 
-### 📋 **Validation Checklist**
+### 📋 **Checklist de Validação**
 
-After deployment, verify:
+Após o deploy, verifique:
 
-- [ ] Site loads correctly at deployment URL
-- [ ] All functionality works as expected
-- [ ] Environment variables are properly set
-- [ ] Custom domains (if configured) are working
-- [ ] SSL certificates are valid
+- [ ] Site carrega corretamente na URL de deploy
+- [ ] Toda funcionalidade funciona como esperado
+- [ ] Variáveis de ambiente estão configuradas corretamente
+- [ ] Domínios customizados (se configurados) estão funcionando
+- [ ] Certificados SSL são válidos
 
 ---
 
-## 🛠️ Troubleshooting
+## 🛠️ Solução de Problemas
 
-### 🚨 **Common Issues & Solutions**
+### 🚨 **Problemas Comuns e Soluções**
 
-#### **Issue: "VERCEL_TOKEN missing or invalid"**
+#### **Problema: "VERCEL_TOKEN ausente ou inválido"**
+
 ```yaml
-# Solution: Check GitHub Secrets configuration
-# Verify token has correct permissions in Vercel dashboard
+# Solução: Verifique a configuração dos GitHub Secrets
+# Confirme que o token tem as permissões corretas no dashboard da Vercel
 ```
 
-#### **Issue: "Project not found"**
+#### **Problema: "Projeto não encontrado"**
+
 ```yaml
-# Solution: Update project name in workflow
-vercel link --yes --project "correct-project-name" --token "$VERCEL_TOKEN"
+# Solução: Atualize o nome do projeto no workflow
+vercel link --yes --project "nome-do-projeto-correto" --token "$VERCEL_TOKEN"
 ```
 
-#### **Issue: "Build failed"**
+#### **Problema: "Build falhou"**
+
 ```yaml
-# Solution: Check build logs in GitHub Actions
-# Verify package.json scripts and dependencies
-# Test build locally first
+# Solução: Verifique os logs de build no GitHub Actions
+# Confirme os scripts do package.json e dependências
+# Teste o build localmente primeiro
 ```
 
-### 🔧 **Debug Commands**
+### 🔧 **Comandos de Debug**
 
 ```bash
-# Local debugging
-vercel --version                    # Check CLI version
-vercel link                        # Link project locally
-vercel env ls                      # List environment variables
-vercel deploy --debug              # Deploy with verbose logging
+# Debug local
+vercel --version                    # Verificar versão do CLI
+vercel link                        # Vincular projeto localmente
+vercel env ls                      # Listar variáveis de ambiente
+vercel deploy --debug              # Deploy com logging verboso
 
-# GitHub CLI debugging  
-gh run list --limit 10             # Recent workflow runs
-gh pr checks                       # Check status for current PR
+# Debug GitHub CLI
+gh run list --limit 10             # Execuções recentes do workflow
+gh pr checks                       # Verificar status do PR atual
 ```
 
-### 📞 **Getting Help**
+### 📞 **Obtendo Ajuda**
 
-- 📖 **GitHub Actions Docs**: [GitHub Actions Documentation](https://docs.github.com/actions)
-- 🚀 **Vercel Docs**: [Vercel CLI Documentation](https://vercel.com/docs/cli)
-- 💬 **Community Support**: [Vercel Discord](https://discord.gg/vercel)
+- 📖 **Documentação GitHub Actions**: [GitHub Actions Documentation](https://docs.github.com/actions)
+- 🚀 **Documentação Vercel**: [Vercel CLI Documentation](https://vercel.com/docs/cli)
+- 💬 **Suporte da Comunidade**: [Vercel Discord](https://discord.gg/vercel)
 
 ---
 
-## 📚 Best Practices
+## 📚 Melhores Práticas
 
-### 🔐 **Security**
+### 🔐 **Segurança**
 
 ```yaml
-# ✅ DO: Use encrypted secrets
+# ✅ FAÇA: Use secrets criptografados
 env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
-# ❌ DON'T: Hardcode sensitive data  
+# ❌ NÃO FAÇA: Hardcode dados sensíveis
 env:
-  VERCEL_TOKEN: "abc123..." # Never do this!
+  VERCEL_TOKEN: "abc123..." # Nunca faça isso!
 ```
 
 ### 🚀 **Performance**
 
 ```yaml
-# ✅ Use specific CLI versions for consistency
+# ✅ Use versões específicas do CLI para consistência
 - name: Install Vercel CLI
   run: npm i -g vercel@latest
 
-# ✅ Cache dependencies when possible
+# ✅ Faça cache das dependências quando possível
 - uses: actions/cache@v3
   with:
     path: ~/.npm
     key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 ```
 
-### 📊 **Monitoring**
+### 📊 **Monitoramento**
 
 ```yaml
-# ✅ Add descriptive step names
+# ✅ Adicione nomes descritivos aos passos
 - name: Deploy Preview to Vercel
   id: deploy
 
-# ✅ Use outputs for chaining steps
+# ✅ Use outputs para encadear passos
 echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
 ```
 
-### 🔄 **Maintenance**
+### 🔄 **Manutenção**
 
-- 🔄 **Regularly update** action versions (`@v4`, `@v3`, etc.)
-- 🔍 **Monitor deprecated** features and migrate when needed
-- 📊 **Review deployment metrics** monthly for optimization opportunities
-- 🧪 **Test workflow changes** in feature branches before merging
-
----
-
-## 🎉 Success Metrics
-
-This CI/CD implementation demonstrates:
-
-- ⚡ **Reduced deployment time** from manual → automated (seconds)
-- 🛡️ **Zero production incidents** due to automated testing
-- 👥 **Improved team collaboration** with preview deployments
-- 📈 **100% deployment success rate** with proper error handling
-- 🔄 **Faster feedback loops** for development teams
+- 🔄 **Atualize regularmente** versões das actions (`@v4`, `@v3`, etc.)
+- 🔍 **Monitore recursos deprecados** e migre quando necessário
+- 📊 **Revise métricas de deploy** mensalmente para oportunidades de otimização
+- 🧪 **Teste mudanças do workflow** em branches de feature antes de fazer merge
 
 ---
 
-## 🔗 Additional Resources
+## 🎉 Métricas de Sucesso
 
-### 📖 **Documentation**
+Esta implementação de CI/CD demonstra:
+
+- ⚡ **Tempo de deploy reduzido** de manual → automatizado (segundos)
+- 🛡️ **Zero incidentes em produção** devido a testes automatizados
+- 👥 **Colaboração melhorada da equipe** com deploys de preview
+- 📈 **100% de taxa de sucesso em deploys** com tratamento adequado de erros
+- 🔄 **Loops de feedback mais rápidos** para equipes de desenvolvimento
+
+---
+
+## 🔗 Recursos Adicionais
+
+### 📖 **Documentação**
+
 - [GitHub Actions Marketplace](https://github.com/marketplace?type=actions)
-- [Vercel CLI Reference](https://vercel.com/docs/cli)
-- [GitHub Secrets Management](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+- [Referência Vercel CLI](https://vercel.com/docs/cli)
+- [Gerenciamento de Secrets GitHub](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
 
-### 🎯 **Related Projects**
-- [Next.js Deployment Guide](https://nextjs.org/docs/deployment)
-- [React Deployment Best Practices](https://create-react-app.dev/docs/deployment/)
+### 🎯 **Projetos Relacionados**
 
-### 🏆 **Professional Development**
-This workflow demonstrates proficiency in:
-- DevOps Engineering
-- CI/CD Pipeline Design  
-- Cloud Platform Integration
+- [Guia de Deploy Next.js](https://nextjs.org/docs/deployment)
+- [Melhores Práticas de Deploy React](https://create-react-app.dev/docs/deployment/)
+
+### 🏆 **Desenvolvimento Profissional**
+
+Este workflow demonstra proficiência em:
+
+- Engenharia DevOps
+- Design de Pipeline CI/CD
+- Integração de Plataformas Cloud
 - Infrastructure as Code
-- Automated Testing & Deployment
+- Testes e Deploy Automatizados
 
 ---
 
 ## 👨‍💻 Author
 
-**Desenvolvido por**: [Vinicius Uchita](https://github.com/devviniuchita)  
-**Propósito**: Demonstração de competências em CI/CD e DevOps  
-**Stack**: GitHub Actions, Vercel, Node.js, YAML  
+**Desenvolvido por**: [Vinicius Uchita](https://github.com/devviniuchita)
+**Propósito**: Demonstração de competências em CI/CD e DevOps
+**Stack**: GitHub Actions, Vercel, Node.js, YAML
 
 ---
 
