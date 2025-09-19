@@ -1,4 +1,4 @@
-name: Vercel Deploy
+name: Deploy to Vercel
 
 on:
   pull_request:
@@ -32,18 +32,15 @@ jobs:
         id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_API_KEY: ${{ secrets.VERCEL_API_KEY }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          TOKEN="$VERCEL_TOKEN"
-          if [ -z "$TOKEN" ]; then TOKEN="$VERCEL_API_KEY"; fi
-          if [ -z "$TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "Vercel secrets ausentes; pulando deploy de preview."
             exit 0
           fi
-          vercel pull --yes --environment=preview --token "$TOKEN" --project "$VERCEL_PROJECT_ID"
-          DEPLOY_URL=$(vercel deploy . --token "$TOKEN" --project "$VERCEL_PROJECT_ID")
+          vercel pull --yes --environment=preview --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID"
+          DEPLOY_URL=$(vercel deploy . --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID")
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
 
@@ -76,15 +73,12 @@ jobs:
       - name: Deploy Production to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_API_KEY: ${{ secrets.VERCEL_API_KEY }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          TOKEN="$VERCEL_TOKEN"
-          if [ -z "$TOKEN" ]; then TOKEN="$VERCEL_API_KEY"; fi
-          if [ -z "$TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
             echo "Segredos do Vercel não configurados; não é possível fazer deploy de produção."
             exit 1
           fi
-          vercel pull --yes --environment=production --token "$TOKEN" --project "$VERCEL_PROJECT_ID"
-          vercel deploy . --prod --token "$TOKEN" --project "$VERCEL_PROJECT_ID"
+          vercel pull --yes --environment=production --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID"
+          vercel deploy . --prod --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID"
           echo "🚀 Production deployed: $DEPLOY_URL"
