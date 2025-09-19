@@ -19,63 +19,42 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
-      - name: Install Vercel CLI and GitHub CLI
-        run: |
-          npm i -g vercel@latest
-          # GitHub CLI already available in runner
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
 
-      - name: Prepare and Deploy to Vercel (Preview)
+      - name: Deploy Preview to Vercel
         id: deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_API_KEY: ${{ secrets.VERCEL_API_KEY }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          # Check for Vercel credentials
-          TOKEN="${{ secrets.VERCEL_TOKEN }}"
-          if [ -z "$TOKEN" ]; then TOKEN="${{ secrets.VERCEL_API_KEY }}"; fi
-          PROJECT="${{ secrets.VERCEL_PROJECT_ID }}"
-          
-          if [ -z "$TOKEN" ] || [ -z "$PROJECT" ]; then
-            echo "⚠️  Vercel secrets not configured. Skipping deployment."
-            echo "Configure VERCEL_TOKEN (or VERCEL_API_KEY) and VERCEL_PROJECT_ID in GitHub Secrets."
+          TOKEN="$VERCEL_TOKEN"
+          if [ -z "$TOKEN" ]; then TOKEN="$VERCEL_API_KEY"; fi
+          if [ -z "$TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Vercel secrets ausentes; pulando deploy de preview."
             exit 0
           fi
-          
-          echo "✅ Vercel credentials found. Starting preview deployment..."
-          
-          # Pull Vercel project settings
-          vercel pull --yes --environment=preview --token "$TOKEN" --project "$PROJECT"
-          
-          # Deploy to Vercel
-          DEPLOY_URL=$(vercel deploy . --token "$TOKEN" --project "$PROJECT")
+          vercel pull --yes --environment=preview --token "$TOKEN" --project "$VERCEL_PROJECT_ID"
+          DEPLOY_URL=$(vercel deploy . --token "$TOKEN" --project "$VERCEL_PROJECT_ID")
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
-          
-          echo "🚀 Preview deployed: $DEPLOY_URL"
 
-      - name: Comment PR with Preview URL
+      - name: Comentar URL no PR
         if: ${{ steps.deploy.outputs.skip == 'false' && steps.deploy.outputs.url != '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          DEPLOY_URL="${{ steps.deploy.outputs.url }}"
           PR_NUMBER="${{ github.event.number }}"
-          
-          # Use GitHub CLI to comment on PR
-          gh pr comment "$PR_NUMBER" --body "🚀 **Preview Vercel Deploy**
-
-          ✅ Deployed successfully: $DEPLOY_URL
-          
-          📝 Commit: ${{ github.sha }}
-          🔗 [View deployment]($DEPLOY_URL)"
+          BODY="🚀 Preview Vercel disponível%0A%0A✅ URL: ${{ steps.deploy.outputs.url }}%0A🧩 Commit: ${{ github.sha }}"
+          gh pr comment "$PR_NUMBER" --body "$BODY"
 
   production:
     name: Production (main)
@@ -85,39 +64,27 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
 
-      - name: Deploy to Vercel (Production)
+      - name: Deploy Production to Vercel
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_API_KEY: ${{ secrets.VERCEL_API_KEY }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          # Check for Vercel credentials
-          TOKEN="${{ secrets.VERCEL_TOKEN }}"
-          if [ -z "$TOKEN" ]; then TOKEN="${{ secrets.VERCEL_API_KEY }}"; fi
-          PROJECT="${{ secrets.VERCEL_PROJECT_ID }}"
-          
-          if [ -z "$TOKEN" ] || [ -z "$PROJECT" ]; then
-            echo "❌ Vercel secrets not configured. Cannot deploy to production."
-            echo "Configure VERCEL_TOKEN (or VERCEL_API_KEY) and VERCEL_PROJECT_ID in GitHub Secrets."
+          TOKEN="$VERCEL_TOKEN"
+          if [ -z "$TOKEN" ]; then TOKEN="$VERCEL_API_KEY"; fi
+          if [ -z "$TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "Segredos do Vercel não configurados; não é possível fazer deploy de produção."
             exit 1
           fi
-          
-          echo "✅ Vercel credentials found. Starting production deployment..."
-          
-          # Pull Vercel project settings
-          vercel pull --yes --environment=production --token "$TOKEN" --project "$PROJECT"
-          
-          # Deploy to production
-          DEPLOY_URL=$(vercel deploy . --prod --token "$TOKEN" --project "$PROJECT")
-          
+          vercel pull --yes --environment=production --token "$TOKEN" --project "$VERCEL_PROJECT_ID"
+          vercel deploy . --prod --token "$TOKEN" --project "$VERCEL_PROJECT_ID"
           echo "🚀 Production deployed: $DEPLOY_URL"
-          echo "✅ Deployment completed successfully."
