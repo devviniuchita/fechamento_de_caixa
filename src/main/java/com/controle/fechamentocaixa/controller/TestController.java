@@ -1,67 +1,70 @@
 package com.controle.fechamentocaixa.controller;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import com.controle.fechamentocaixa.model.Usuario;
+import com.controle.fechamentocaixa.repository.UsuarioRepository;
 
 /**
- * Controller para testar endpoints públicos e protegidos
+ * Controller para testes e debug
  */
 @RestController
 @RequestMapping("/test")
 public class TestController {
 
-    /**
-     * Endpoint público para teste
-     *
-     * @return Mensagem de saudação
-     */
-    @GetMapping("/public")
-    public String publicAccess() {
-        return "Conteúdo público";
-    }
+  @Autowired
+  private UsuarioRepository usuarioRepository;
 
-    /**
-     * Endpoint protegido para qualquer usuário autenticado
-     *
-     * @return Mensagem de saudação para usuário autenticado
-     */
-    @GetMapping("/user")
-    public String userAccess() {
-        return "Conteúdo para usuário autenticado";
-    }
+  @GetMapping("/usuarios")
+  public List<Usuario> listarUsuarios() {
+    return usuarioRepository.findAll();
+  }
 
-    /**
-     * Endpoint protegido para administradores
-     *
-     * @return Mensagem de saudação para administrador
-     */
-    @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String adminAccess() {
-        return "Conteúdo para administrador";
-    }
+  @GetMapping("/health")
+  public String health() {
+    return "OK - Application is running";
+  }
 
-    /**
-     * Endpoint protegido para gerentes
-     *
-     * @return Mensagem de saudação para gerente
-     */
-    @GetMapping("/gerente")
-    @PreAuthorize("hasRole('GERENTE')")
-    public String gerenteAccess() {
-        return "Conteúdo para gerente";
-    }
+  @GetMapping("/public")
+  public List<Usuario> listarUsuariosPublic() {
+    return usuarioRepository.findAll();
+  }
 
-    /**
-     * Endpoint protegido para caixas
-     *
-     * @return Mensagem de saudação para caixa
-     */
-    @GetMapping("/caixa")
-    @PreAuthorize("hasRole('CAIXA')")
-    public String caixaAccess() {
-        return "Conteúdo para caixa";
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private com.controle.fechamentocaixa.service.PasswordMigrationService passwordMigrationService;
+
+  @GetMapping("/fix-passwords")
+  public String fixPasswords() {
+    try {
+      long plainTextCount = passwordMigrationService.getPlainTextPasswordCount();
+      if (plainTextCount == 0) {
+        return "No users with plain text passwords found";
+      }
+
+      passwordMigrationService.migrateAllPasswords();
+      return "Password migration completed. Check logs for details.";
+    } catch (Exception e) {
+      return "Error: " + e.getMessage();
     }
+  }
+
+  @GetMapping("/password-status")
+  public String getPasswordStatus() {
+    try {
+      long plainTextCount = passwordMigrationService.getPlainTextPasswordCount();
+      List<String> usersWithPlainText = passwordMigrationService.getUsersWithPlainTextPasswords();
+
+      return String.format("Users with plain text passwords: %d. Users: %s",
+          plainTextCount, usersWithPlainText);
+    } catch (Exception e) {
+      return "Error: " + e.getMessage();
+    }
+  }
 }

@@ -27,6 +27,26 @@
       "args": "",
       "vmArgs": "-Dserver.port=8081 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
       "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-FechamentoCaixaApplication<fechamento-de-caixa>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.controle.fechamentocaixa.FechamentoCaixaApplication",
+      "projectName": "fechamento-de-caixa",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-MongoClientConnectionExample<fechamento-de-caixa>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.controle.fechamentocaixa.MongoClientConnectionExample",
+      "projectName": "fechamento-de-caixa",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }

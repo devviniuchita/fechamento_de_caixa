@@ -143,6 +143,13 @@
                   class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full"
                   >Admin</span
                 >
+                <button
+                  onclick="handleLogout()"
+                  class="ml-2 p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded-full"
+                  title="Sair do sistema"
+                >
+                  <i class="fas fa-sign-out-alt"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -776,27 +783,187 @@
               </div>
 
               <!-- Informações de Impressão (visíveis apenas na impressão) -->
+              <!-- Print Version (hidden by default, visible when printing) -->
               <div class="print-only mt-8">
-                <div class="text-center mb-4">
+                <div class="text-center mb-6">
                   <h2 class="text-xl font-bold">Fechamento de Caixa</h2>
                   <p class="text-sm text-gray-600">
-                    Data: <span id="print-date"></span> - Hora:
-                    <span id="print-time"></span>
+                    Data: <span id="print-data">30/04/2025</span> - Responsável:
+                    <span id="print-responsavel">Vinícius</span>
                   </p>
-                  <p class="text-sm">Status: <span id="print-status"></span></p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <h3 class="font-semibold mb-3">Informações Básicas</h3>
+                    <div class="space-y-2 text-sm">
+                      <div class="flex justify-between">
+                        <span>Caixa Inicial:</span>
+                        <span id="print-caixa-inicial">100,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Vendas:</span>
+                        <span id="print-vendas">100,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Troco Inserido:</span>
+                        <span id="print-troco-inserido">50,00</span>
+                      </div>
+                      <div class="flex justify-between font-semibold">
+                        <span>Total Entradas:</span>
+                        <span id="print-total-entradas">250,00</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 class="font-semibold mb-3">Formas de Pagamento</h3>
+                    <div class="space-y-2 text-sm">
+                      <div class="flex justify-between">
+                        <span>Dinheiro:</span>
+                        <span id="print-dinheiro">100,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>PIX:</span>
+                        <span id="print-pix">15,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Depósito:</span>
+                        <span id="print-deposito">10,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Sangria:</span>
+                        <span id="print-sangria">40,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Vale:</span>
+                        <span id="print-vale">10,00</span>
+                      </div>
+                      <div class="flex justify-between font-semibold">
+                        <span>Total Ativos:</span>
+                        <span id="print-total-ativos">175,00</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <h3 class="font-semibold mb-3">Cartões de Débito</h3>
+                    <div class="space-y-2 text-sm">
+                      <div class="flex justify-between">
+                        <span>Visa Débito:</span>
+                        <span id="print-visa-debito">5,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Master Débito:</span>
+                        <span id="print-master-debito">5,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Elo Débito:</span>
+                        <span id="print-elo-debito">20,00</span>
+                      </div>
+                      <div class="flex justify-between font-semibold">
+                        <span>Total Débito:</span>
+                        <span id="print-total-debito">30,00</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 class="font-semibold mb-3">Cartões de Crédito</h3>
+                    <div class="space-y-2 text-sm">
+                      <div class="flex justify-between">
+                        <span>Visa Crédito:</span>
+                        <span id="print-visa-credito">5,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Master Crédito:</span>
+                        <span id="print-master-credito">5,00</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span>Elo Crédito:</span>
+                        <span id="print-elo-credito">5,00</span>
+                      </div>
+                      <div class="flex justify-between font-semibold">
+                        <span>Total Crédito:</span>
+                        <span id="print-total-credito">15,00</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-6">
+                  <h3 class="font-semibold mb-3">Outros</h3>
+                  <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                      <span>Voucher:</span>
+                      <span id="print-voucher">5,00</span>
+                    </div>
+                    <div class="flex justify-between font-semibold">
+                      <span>Total Cartões:</span>
+                      <span id="print-total-cartoes">50,00</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-6">
+                  <h3 class="font-semibold mb-3">Despesas</h3>
+                  <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr class="bg-gray-100">
+                        <th class="border border-gray-300 px-4 py-2 text-left">
+                          Descrição
+                        </th>
+                        <th class="border border-gray-300 px-4 py-2 text-left">
+                          Valor
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="print-despesas">
+                      <!-- Despesas will be populated by JavaScript -->
+                    </tbody>
+                  </table>
+                  <div class="flex justify-between font-semibold mt-2">
+                    <span>Total Despesas:</span>
+                    <span id="print-total-despesas">25,00</span>
+                  </div>
+                </div>
+
+                <div class="border-t pt-4">
+                  <div class="flex justify-between text-lg font-bold">
+                    <span>Total Caixa:</span>
+                    <span id="print-total-caixa">-75,00</span>
+                  </div>
+                  <div
+                    class="mt-2 text-sm text-red-600"
+                    id="print-inconsistencia-message"
+                  >
+                    <!-- Inconsistency message will be populated by JavaScript -->
+                  </div>
                 </div>
               </div>
 
               <div class="flex justify-end space-x-4">
                 <button
+                  type="button"
+                  onclick="testAPIConnection()"
+                  class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
+                >
+                  <i class="fas fa-wifi mr-2"></i>Testar Conexão
+                </button>
+                <button
+                  type="button"
                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
                 >
                   <i class="fas fa-save mr-2"></i>Salvar Rascunho
                 </button>
                 <button
-                  class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                  type="button"
+                  onclick="finalizarFechamento()"
+                  class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md font-medium"
                 >
-                  <i class="fas fa-check-circle mr-2"></i>Finalizar Fechamento
+                  <i class="fas fa-check mr-2"></i>Finalizar Fechamento
                 </button>
                 <button
                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
@@ -1430,6 +1597,83 @@
         </main>
       </div>
     </div>
+    <!-- Login Modal -->
+    <div
+      id="login-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-800">Login</h2>
+          <button
+            onclick="hideLoginModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <form onsubmit="handleLogin(event)" class="space-y-4">
+          <div>
+            <label
+              for="login-email"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="login-email"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="seu@email.com"
+            />
+          </div>
+
+          <div>
+            <label
+              for="login-senha"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Senha
+            </label>
+            <input
+              type="password"
+              id="login-senha"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Sua senha"
+            />
+          </div>
+
+          <div class="flex space-x-3 pt-4">
+            <button
+              type="submit"
+              class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-medium"
+            >
+              Entrar
+            </button>
+            <button
+              type="button"
+              onclick="hideLoginModal()"
+              class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-md font-medium"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+
+        <div class="mt-4 text-center">
+          <p class="text-sm text-gray-600">
+            Primeiro acesso? O sistema criará automaticamente um usuário
+            administrador.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="public/js/api-service.js"></script>
     <script src="public/js/app.js"></script>
   </body>
 </html>

@@ -8,10 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * Modelo de usuário para autenticação e autorização no sistema
@@ -23,93 +20,95 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Usuario {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    @Indexed(unique = true)
-    private String email;
+  @Indexed(unique = true)
+  private String email;
 
-    private String nome;
+  private String nome;
 
-    private String senha; // Armazenada com BCrypt
+  private String senha; // Armazenada com BCrypt
 
-    private Set<Perfil> perfis = new HashSet<>();
+  @Builder.Default
+  private Set<Perfil> perfis = new HashSet<>();
 
-    private boolean ativo = true;
+  @Builder.Default
+  private boolean ativo = true;
 
-    private LocalDateTime dataCriacao;
+  private LocalDateTime dataCriacao;
 
-    private LocalDateTime dataUltimoAcesso;
+  private LocalDateTime dataUltimoAcesso;
 
-    public boolean possuiPerfil(Perfil perfil) {
-        return perfis.contains(perfil);
-    }
+  public boolean possuiPerfil(Perfil perfil) {
+    return perfis.contains(perfil);
+  }
 
-    public boolean isAdmin() {
-        return perfis.contains(Perfil.ADMIN);
-    }
+  public boolean isAdmin() {
+    return perfis.contains(Perfil.ADMIN);
+  }
 
-    public String getId() {
-        return id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public String getNome() {
-        return nome;
-    }
+  public String getNome() {
+    return nome;
+  }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+  public void setNome(String nome) {
+    this.nome = nome;
+  }
 
-    public String getSenha() {
-        return senha;
-    }
+  public String getSenha() {
+    return senha;
+  }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
+  public void setSenha(String senha) {
+    this.senha = senha;
+  }
 
-    public Set<Perfil> getPerfis() {
-        return perfis;
-    }
+  public Set<Perfil> getPerfis() {
+    return perfis;
+  }
 
-    public void setPerfis(Set<Perfil> perfis) {
-        this.perfis = perfis;
-    }
+  public void setPerfis(Set<Perfil> perfis) {
+    this.perfis = perfis;
+  }
 
-    public boolean isAtivo() {
-        return ativo;
-    }
+  public boolean isAtivo() {
+    return ativo;
+  }
 
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
+  public void setAtivo(boolean ativo) {
+    this.ativo = ativo;
+  }
 
-    public LocalDateTime getDataCriacao() {
-        return dataCriacao;
-    }
+  public LocalDateTime getDataCriacao() {
+    return dataCriacao;
+  }
 
-    public void setDataCriacao(LocalDateTime dataCriacao) {
-        this.dataCriacao = dataCriacao;
-    }
+  public void setDataCriacao(LocalDateTime dataCriacao) {
+    this.dataCriacao = dataCriacao;
+  }
 
-    public LocalDateTime getDataUltimoAcesso() {
-        return dataUltimoAcesso;
-    }
+  public LocalDateTime getDataUltimoAcesso() {
+    return dataUltimoAcesso;
+  }
 
-    public void setDataUltimoAcesso(LocalDateTime dataUltimoAcesso) {
-        this.dataUltimoAcesso = dataUltimoAcesso;
-    }
+  public void setDataUltimoAcesso(LocalDateTime dataUltimoAcesso) {
+    this.dataUltimoAcesso = dataUltimoAcesso;
+  }
 }

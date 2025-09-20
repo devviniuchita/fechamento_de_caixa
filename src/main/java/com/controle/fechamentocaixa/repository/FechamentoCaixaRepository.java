@@ -1,9 +1,12 @@
 package com.controle.fechamentocaixa.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,43 +15,55 @@ import com.controle.fechamentocaixa.model.FechamentoCaixa;
 import com.controle.fechamentocaixa.model.StatusFechamento;
 
 /**
- * Repository para operações com FechamentoCaixa no MongoDB Atlas
+ * Repository para operações com FechamentoCaixa no MongoDB
+ * Segue o design especificado com métodos para idempotência diária e consultas
+ * otimizadas
  */
 @Repository
 public interface FechamentoCaixaRepository extends MongoRepository<FechamentoCaixa, String> {
 
   /**
-   * Busca fechamento por caixa
+   * Busca fechamento por responsável e data (para idempotência diária)
+   * Usado para prevenir fechamentos duplicados no mesmo dia
    */
-  Optional<FechamentoCaixa> findByCaixaId(String caixaId);
+  Optional<FechamentoCaixa> findByResponsavelAndData(String responsavel, LocalDate data);
 
   /**
-   * Busca fechamentos por status
+   * Busca fechamentos por intervalo de datas ordenados por data decrescente
+   * Usado para consultas de período com paginação
    */
-  List<FechamentoCaixa> findByStatusOrderByDataFechamentoDesc(StatusFechamento status);
+  List<FechamentoCaixa> findByDataBetweenOrderByDataDesc(LocalDate dataInicio, LocalDate dataFim);
 
   /**
-   * Busca fechamentos por período
+   * Busca fechamentos por intervalo de datas com paginação
    */
-  List<FechamentoCaixa> findByDataFechamentoGreaterThanEqualAndDataFechamentoLessThanEqual(
-      LocalDateTime inicio, LocalDateTime fim);
+  Page<FechamentoCaixa> findByDataBetweenOrderByDataDesc(LocalDate dataInicio, LocalDate dataFim, Pageable pageable);
 
   /**
-   * Busca fechamentos de um usuário
+   * Busca fechamentos por status e intervalo de datas
    */
-  List<FechamentoCaixa> findByUsuarioIdOrderByDataFechamentoDesc(String usuarioId);
+  List<FechamentoCaixa> findByStatusAndDataBetween(StatusFechamento status, LocalDate dataInicio, LocalDate dataFim);
 
   /**
-   * Busca fechamentos com diferença
+   * Busca fechamentos por responsável ordenados por data decrescente
    */
-  @Query("{ 'diferencaTotal': { $ne: 0 } }")
-  List<FechamentoCaixa> findFechamentosComDiferenca();
+  List<FechamentoCaixa> findByResponsavelOrderByDataDesc(String responsavel);
 
   /**
-   * Busca fechamentos pendentes de aprovação
+   * Busca fechamentos por status ordenados por data decrescente
    */
-  List<FechamentoCaixa> findByStatusAndDataFechamentoLessThan(
-      StatusFechamento status, LocalDateTime dataLimite);
+  List<FechamentoCaixa> findByStatusOrderByDataDesc(StatusFechamento status);
+
+  /**
+   * Busca fechamentos inconsistentes (com diferença)
+   */
+  @Query("{ 'consistente': false }")
+  List<FechamentoCaixa> findFechamentosInconsistentes();
+
+  /**
+   * Busca fechamentos por data específica
+   */
+  List<FechamentoCaixa> findByDataOrderByResponsavel(LocalDate data);
 
   /**
    * Conta fechamentos por status
@@ -56,16 +71,22 @@ public interface FechamentoCaixaRepository extends MongoRepository<FechamentoCai
   long countByStatus(StatusFechamento status);
 
   /**
-   * Busca último fechamento de um usuário
+   * Busca último fechamento de um responsável
    */
-  Optional<FechamentoCaixa> findFirstByUsuarioIdOrderByDataFechamentoDesc(String usuarioId);
+  Optional<FechamentoCaixa> findFirstByResponsavelOrderByDataDesc(String responsavel);
 
   /**
-   * Busca fechamentos para auditoria
+   * Busca fechamentos que precisam de conferência (status FECHADO)
    */
-  @Query("{ $or: [ " +
-      "{ 'diferencaTotal': { $gt: 0 } }, " +
-      "{ 'status': 'EM_AUDITORIA' } " +
-      "] }")
-  List<FechamentoCaixa> findFechamentosParaAuditoria();
+  List<FechamentoCaixa> findByStatusOrderByCriadoEmAsc(StatusFechamento status);
+
+  /**
+   * Verifica se existe fechamento para responsável e data
+   */
+  boolean existsByResponsavelAndData(String responsavel, LocalDate data);
+
+  /**
+   * Busca fechamentos criados em um período específico
+   */
+  List<FechamentoCaixa> findByCriadoEmBetweenOrderByCriadoEmDesc(LocalDateTime inicio, LocalDateTime fim);
 }

@@ -1,11 +1,11 @@
 package com.controle.fechamentocaixa.model;
 
 /**
- * Enum para status do fechamento
+ * Enum para status do fechamento de caixa
+ * Sequência: ABERTO → FECHADO → CONFERIDO
  */
 public enum StatusFechamento {
-  PENDENTE,
-  APROVADO,
-  REJEITADO,
-  EM_AUDITORIA
+  ABERTO,
+  FECHADO,
+  CONFERIDO
 }
