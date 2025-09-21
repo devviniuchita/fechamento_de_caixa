@@ -20,14 +20,11 @@ import com.controle.fechamentocaixa.repository.FechamentoCaixaRepository;
 import com.controle.fechamentocaixa.service.CalculationService;
 import com.controle.fechamentocaixa.service.FechamentoService;
 
-import lombok.RequiredArgsConstructor;
-
 /**
  * Implementação do serviço de negócio de fechamento de caixa
  * Gerencia transações, validações e regras de negócio
  */
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class FechamentoServiceImpl implements FechamentoService {
 
@@ -35,6 +32,12 @@ public class FechamentoServiceImpl implements FechamentoService {
 
   private final FechamentoCaixaRepository repository;
   private final CalculationService calculationService;
+
+  // Constructor manual para compatibilidade com Java 24
+  public FechamentoServiceImpl(FechamentoCaixaRepository repository, CalculationService calculationService) {
+    this.repository = repository;
+    this.calculationService = calculationService;
+  }
 
   @Override
   public FechamentoResponse criarFechamento(FechamentoRequest request) {
