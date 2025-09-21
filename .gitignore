@@ -484,6 +484,7 @@ nul
 .classpath.json
 .project
 .project.json
+testsprite_tests/
 
 # VSCode specific files (keep essential, ignore user-specific)
 .vscode/settings.json

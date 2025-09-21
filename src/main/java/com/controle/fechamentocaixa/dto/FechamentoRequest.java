@@ -18,7 +18,6 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class FechamentoRequest {
 
   @NotNull(message = "Data é obrigatória")
@@ -29,17 +28,14 @@ public class FechamentoRequest {
 
   @NotNull(message = "Caixa inicial é obrigatório")
   @DecimalMin(value = "0.00", message = "Caixa inicial deve ser não-negativo")
-  @Builder.Default
   private BigDecimal caixaInicial = BigDecimal.ZERO;
 
   @NotNull(message = "Vendas é obrigatório")
   @DecimalMin(value = "0.00", message = "Vendas deve ser não-negativo")
-  @Builder.Default
   private BigDecimal vendas = BigDecimal.ZERO;
 
   @NotNull(message = "Troco inserido é obrigatório")
   @DecimalMin(value = "0.00", message = "Troco inserido deve ser não-negativo")
-  @Builder.Default
   private BigDecimal trocoInserido = BigDecimal.ZERO;
 
   @Valid
@@ -125,57 +121,68 @@ public class FechamentoRequest {
     this.comprovantes = comprovantes;
   }
 
-  // Builder pattern para compatibilidade
-  public static FechamentoRequest builder() {
-    return new FechamentoRequest();
+  /**
+   * Builder pattern customizado para compatibilidade com código existente
+   * Mantém comportamento esperado onde build() retorna this em vez de nova
+   * instância
+   */
+  public static FechamentoRequestBuilder builder() {
+    return new FechamentoRequestBuilder();
   }
 
-  public FechamentoRequest data(LocalDate data) {
-    this.data = data;
-    return this;
-  }
+  /**
+   * Builder interno customizado que preserva comportamento legacy
+   */
+  public static class FechamentoRequestBuilder {
+    private final FechamentoRequest instance = new FechamentoRequest();
 
-  public FechamentoRequest responsavel(String responsavel) {
-    this.responsavel = responsavel;
-    return this;
-  }
+    public FechamentoRequestBuilder data(LocalDate data) {
+      instance.data = data;
+      return this;
+    }
 
-  public FechamentoRequest caixaInicial(BigDecimal caixaInicial) {
-    this.caixaInicial = caixaInicial;
-    return this;
-  }
+    public FechamentoRequestBuilder responsavel(String responsavel) {
+      instance.responsavel = responsavel;
+      return this;
+    }
 
-  public FechamentoRequest vendas(BigDecimal vendas) {
-    this.vendas = vendas;
-    return this;
-  }
+    public FechamentoRequestBuilder caixaInicial(BigDecimal caixaInicial) {
+      instance.caixaInicial = caixaInicial;
+      return this;
+    }
 
-  public FechamentoRequest trocoInserido(BigDecimal trocoInserido) {
-    this.trocoInserido = trocoInserido;
-    return this;
-  }
+    public FechamentoRequestBuilder vendas(BigDecimal vendas) {
+      instance.vendas = vendas;
+      return this;
+    }
 
-  public FechamentoRequest formasPagamento(FormasPagamento formasPagamento) {
-    this.formasPagamento = formasPagamento;
-    return this;
-  }
+    public FechamentoRequestBuilder trocoInserido(BigDecimal trocoInserido) {
+      instance.trocoInserido = trocoInserido;
+      return this;
+    }
 
-  public FechamentoRequest despesas(List<Despesa> despesas) {
-    this.despesas = despesas;
-    return this;
-  }
+    public FechamentoRequestBuilder formasPagamento(FormasPagamento formasPagamento) {
+      instance.formasPagamento = formasPagamento;
+      return this;
+    }
 
-  public FechamentoRequest observacoes(String observacoes) {
-    this.observacoes = observacoes;
-    return this;
-  }
+    public FechamentoRequestBuilder despesas(List<Despesa> despesas) {
+      instance.despesas = despesas;
+      return this;
+    }
 
-  public FechamentoRequest comprovantes(List<String> comprovantes) {
-    this.comprovantes = comprovantes;
-    return this;
-  }
+    public FechamentoRequestBuilder observacoes(String observacoes) {
+      instance.observacoes = observacoes;
+      return this;
+    }
 
-  public FechamentoRequest build() {
-    return this;
+    public FechamentoRequestBuilder comprovantes(List<String> comprovantes) {
+      instance.comprovantes = comprovantes;
+      return this;
+    }
+
+    public FechamentoRequest build() {
+      return instance; // Preserva comportamento esperado
+    }
   }
 }

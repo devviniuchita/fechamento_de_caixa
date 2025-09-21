@@ -44,14 +44,15 @@ public class SecurityConfig {
   }
 
   /**
-   * Configuração do provedor de autenticação
+   * Configuração do provedor de autenticação com API moderna
    *
-   * @return Provedor de autenticação DAO
+   * @return Provedor de autenticação DAO configurado
    */
   @Bean
   public DaoAuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
+    // Usar setters modernos diretamente
     authProvider.setUserDetailsService(userDetailsService);
     authProvider.setPasswordEncoder(passwordEncoder());
 

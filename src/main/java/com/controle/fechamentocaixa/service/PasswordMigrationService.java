@@ -29,45 +29,43 @@ public class PasswordMigrationService {
    * Migrates all users with plain text passwords to BCrypt encoding
    */
   public void migrateAllPasswords() {
-    logger.info("Starting password migration process...");
+    try {
+      logger.info("Starting password migration process...");
 
-    List<Usuario> allUsers = usuarioRepository.findAll();
-    int totalUsers = allUsers.size();
-    int migratedCount = 0;
-    int skippedCount = 0;
-    int errorCount = 0;
+      List<Usuario> allUsers = usuarioRepository.findAll();
+      int totalUsers = allUsers.size();
+      int migratedCount = 0;
+      int skippedCount = 0;
+      int errorCount = 0;
 
-    logger.info("Found {} users to process", totalUsers);
+      logger.info("Found {} users to process", totalUsers);
 
-    for (Usuario user : allUsers) {
-      try {
-        if (isPasswordEncoded(user.getSenha())) {
-          logger.debug("Skipping user {} - password already encoded", user.getEmail());
-          skippedCount++;
-          continue;
+      for (Usuario user : allUsers) {
+        try {
+          if (isPasswordEncoded(user.getSenha())) {
+            logger.debug("Skipping user {} - password already encoded", user.getEmail());
+            skippedCount++;
+            continue;
+          }
+
+          migrateUserPassword(user);
+          migratedCount++;
+          logger.info("Successfully migrated password for user: {}", user.getEmail());
+
+        } catch (Exception e) {
+          errorCount++;
+          logger.error("Failed to migrate password for user: {} - Error: {}",
+              user.getEmail(), e.getMessage(), e);
         }
-
-        migrateUserPassword(user);
-        migratedCount++;
-        logger.info("Successfully migrated password for user: {}", user.getEmail());
-
-      } catch (Exception e) {
-        errorCount++;
-        logger.error("Failed to migrate password for user: {} - Error: {}",
-            user.getEmail(), e.getMessage(), e);
       }
+
+      logger.info("Password migration completed. Total: {}, Migrated: {}, Skipped: {}, Errors: {}",
+          totalUsers, migratedCount, skippedCount, errorCount);
+
+    } catch (Exception e) {
+      logger.error("Critical error during password migration: {}", e.getMessage(), e);
+      throw new RuntimeException("Password migration failed", e);
     }
-
-    logger.info("Password migration completed. Total: {}, Migrated: {}, Skipped: {}, Errors: {}",
-        totalUsers, migratedCount, skippedCount, errorCount);
-
-  }catch(
-
-  Exception e)
-  {
-    logger.error("Critical error during password migration: {}", e.getMessage(), e);
-    throw new RuntimeException("Password migration failed", e);
-  }
   }
 
   /**
@@ -122,7 +120,7 @@ public class PasswordMigrationService {
   }
 
   /**
-   * ts count of users with plain text passwords
+   * Gets count of users with plain text passwords
    *
    * @return number of users with plain text passwords
    */

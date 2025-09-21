@@ -12,13 +12,10 @@ import com.controle.fechamentocaixa.dto.*;
 import com.controle.fechamentocaixa.model.*;
 import com.controle.fechamentocaixa.service.CalculationService;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Implementação do serviço de cálculos financeiros
  * Usa precisão BigDecimal com 2 casas decimais para garantir exatidão monetária
  */
-@Slf4j
 @Service
 public class CalculationServiceImpl implements CalculationService {
 

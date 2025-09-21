@@ -3,7 +3,6 @@ package com.controle.fechamentocaixa.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.controle.fechamentocaixa.model.Usuario;
@@ -33,9 +32,6 @@ public class TestController {
   public List<Usuario> listarUsuariosPublic() {
     return usuarioRepository.findAll();
   }
-
-  @Autowired
-  private PasswordEncoder passwordEncoder;
 
   @Autowired
   private com.controle.fechamentocaixa.service.PasswordMigrationService passwordMigrationService;

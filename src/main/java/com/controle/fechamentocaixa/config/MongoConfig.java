@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.lang.NonNull;
 
 import com.controle.fechamentocaixa.model.Perfil;
 
@@ -29,10 +30,7 @@ public class MongoConfig {
      */
     public static class PerfilReadConverter implements Converter<String, Perfil> {
         @Override
-        public Perfil convert(String source) {
-            if (source == null) {
-                return Perfil.CAIXA;
-            }
+        public Perfil convert(@NonNull String source) {
             try {
                 return Perfil.valueOf(source);
             } catch (IllegalArgumentException e) {
@@ -47,8 +45,8 @@ public class MongoConfig {
      */
     public static class PerfilWriteConverter implements Converter<Perfil, String> {
         @Override
-        public String convert(Perfil source) {
-            return source != null ? source.name() : "CAIXA";
+        public String convert(@NonNull Perfil source) {
+            return source.name();
         }
     }
 }
