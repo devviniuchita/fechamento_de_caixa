@@ -93,11 +93,14 @@ public class SecurityConfig {
     http.csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll()
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/", "/index.html", "/*.html", "/*.css", "/*.js").permitAll()
+            .requestMatchers("/public/**", "/css/**", "/js/**", "/images/**", "/fonts/**").permitAll()
+            .requestMatchers("/auth/**").permitAll()
             .requestMatchers("/test/public").permitAll()
             .requestMatchers("/test/fix-passwords").permitAll()
             .requestMatchers("/test/password-status").permitAll()
-            .requestMatchers("/public/**").permitAll()
+            .requestMatchers("/test/health").permitAll()
             .anyRequest().authenticated());
 
     http.authenticationProvider(authenticationProvider());
