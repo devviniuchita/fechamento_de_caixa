@@ -90,6 +90,7 @@ const response = await API.fechamentos.criarFechamento();
 - **Fechamentos Table**: Live data from database
 - **Auto-refresh**: Updates after operations
 - **Status Indicators**: Visual feedback for data state
+- **Errors of Cash (Erros de Caixa)**: Inconsistencies card is clickable and opens a dedicated screen with filters, summary (over/short), and CSV export. This screen will be fed by a projection sourced from domain events (DDD roadmap).
 
 ### ✅ User Experience
 
@@ -158,6 +159,10 @@ npx serve .
 - `GET /api/fechamentos` - List fechamentos ✅ **INTEGRATED**
 - `GET /api/fechamentos/{id}` - Get fechamento by ID
 - `POST /api/fechamentos/{id}/validar` - Validate fechamento
+
+### Projections (Roadmap)
+
+- `GET /api/projecoes/erros-caixa` - List cash errors (read model) — to be implemented via domain events
 
 ### Users
 

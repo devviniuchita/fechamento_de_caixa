@@ -11,6 +11,21 @@ document.addEventListener("DOMContentLoaded", function () {
   if (resetBtn) {
     resetBtn.addEventListener("click", openResetDevModal);
   }
+
+  // Card "Inconsistências" → navega para Erros de Caixa
+  const inconsistenciasCard = document.getElementById("inconsistencias-card");
+  if (inconsistenciasCard) {
+    const goErros = () => {
+      if (checkAuthentication()) {
+        showContent("erros");
+        loadErrosDeCaixa();
+      }
+    };
+    inconsistenciasCard.addEventListener("click", goErros);
+    inconsistenciasCard.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") goErros();
+    });
+  }
 });
 
 // Authentication check
@@ -109,13 +124,25 @@ async function loadDashboardData() {
   if (!API.auth.isAuthenticated()) return;
 
   try {
-    const fechamentos = await API.fechamentos.listarFechamentos({
+    const fechamentosResponse = await API.fechamentos.listarFechamentos({
       size: 10,
       sort: "data,desc",
     });
 
-    updateDashboardStats(fechamentos);
-    updateFechamentosTable(fechamentos);
+    // Normaliza coleção
+    const allItems = fechamentosResponse.content || fechamentosResponse || [];
+
+    // Seleciona os "últimos" N itens (já em desc pelo backend)
+    const latestDesc = allItems.slice(0, 5);
+
+    // Para exibição na tabela: ordenar da menor data para a maior (asc)
+    const latestAsc = [...latestDesc].sort(
+      (a, b) => new Date(a.data) - new Date(b.data),
+    );
+
+    // Atualiza cards com o mesmo subconjunto exibido
+    updateDashboardStats(latestDesc);
+    updateFechamentosTable(latestAsc);
   } catch (error) {
     console.error("Error loading dashboard data:", error);
     if (error.isUnauthorized()) {
@@ -127,19 +154,20 @@ async function loadDashboardData() {
 }
 
 // Update dashboard statistics
-function updateDashboardStats(fechamentosData) {
-  const fechamentos = fechamentosData.content || fechamentosData;
+function updateDashboardStats(fechamentosSubset) {
+  const fechamentos = fechamentosSubset || [];
 
-  // Count today's fechamentos
+  // Fechamentos de hoje (no subconjunto exibido)
   const today = new Date().toISOString().split("T")[0];
   const fechamentosHoje = fechamentos.filter((f) => f.data === today).length;
 
-  // Calculate total sales
+  // Soma de vendas (no subconjunto exibido)
   const totalVendas = fechamentos.reduce((sum, f) => sum + (f.vendas || 0), 0);
 
-  // Count inconsistencies
+  // Contagem de inconsistências com base em totalCaixa (tolerância centavos)
+  const EPS = 0.009; // tolerância para arredondamentos
   const inconsistencias = fechamentos.filter(
-    (f) => f.status === "INCONSISTENTE",
+    (f) => Math.abs(f.totalCaixa || 0) > EPS,
   ).length;
 
   // Update UI
@@ -147,8 +175,8 @@ function updateDashboardStats(fechamentosData) {
     fechamentosHoje;
   document.querySelector(".grid .bg-white:nth-child(2) h3").textContent =
     API.formatCurrency(totalVendas);
-  document.querySelector(".grid .bg-white:nth-child(3) h3").textContent =
-    inconsistencias;
+  const inconsistenciasEl = document.querySelector("#inconsistencias-card h3");
+  if (inconsistenciasEl) inconsistenciasEl.textContent = inconsistencias;
 }
 
 // Update fechamentos table
@@ -161,6 +189,19 @@ function updateFechamentosTable(fechamentosData) {
   tbody.innerHTML = "";
 
   fechamentos.slice(0, 5).forEach((fechamento) => {
+    // Determina status a partir do totalCaixa
+    const EPS = 0.009;
+    const isCorreto = Math.abs(fechamento.totalCaixa || 0) <= EPS;
+    const statusLabel = isCorreto ? "Caixa Correto" : "Inconsistente";
+    const statusClass = isCorreto
+      ? "bg-green-100 text-green-800"
+      : "bg-red-100 text-red-800";
+    const motivoTooltip = isCorreto
+      ? "Diferença zerada"
+      : fechamento.totalCaixa < 0
+        ? `Faltando ${API.formatCurrency(Math.abs(fechamento.totalCaixa))}`
+        : `Sobrando ${API.formatCurrency(Math.abs(fechamento.totalCaixa))}`;
+
     const row = document.createElement("tr");
     row.innerHTML = `
       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -176,12 +217,8 @@ function updateFechamentosTable(fechamentosData) {
         ${API.formatCurrency(fechamento.totalCaixa)}
       </td>
       <td class="px-6 py-4 whitespace-nowrap">
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-          fechamento.status === "OK"
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
-        }">
-          ${fechamento.status === "OK" ? "OK" : "Inconsistente"}
+        <span title="${motivoTooltip}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+          ${statusLabel}
         </span>
       </td>
     `;
@@ -237,11 +274,22 @@ document
     }
   });
 
+// Novo: Erros de Caixa
+document.getElementById("erros-link")?.addEventListener("click", function (e) {
+  e.preventDefault();
+  if (checkAuthentication()) {
+    showContent("erros");
+    loadErrosDeCaixa();
+  }
+});
+
 function showContent(content) {
   // Hide all content
   document.getElementById("dashboard-content").classList.add("hidden");
   document.getElementById("fechamento-content").classList.add("hidden");
   document.getElementById("relatorios-content").classList.add("hidden");
+  const errosContent = document.getElementById("erros-content");
+  if (errosContent) errosContent.classList.add("hidden");
   document.getElementById("comprovantes-content").classList.add("hidden");
   document.getElementById("usuarios-content").classList.add("hidden");
 
@@ -268,6 +316,9 @@ function showContent(content) {
     case "relatorios":
       title = "Relatórios";
       break;
+    case "erros":
+      title = "Erros de Caixa";
+      break;
     case "comprovantes":
       title = "Comprovantes";
       break;
@@ -277,6 +328,160 @@ function showContent(content) {
   }
   document.getElementById("page-title").textContent = title;
 }
+
+// ===============================
+// Erros de Caixa - Tela dedicada
+// ===============================
+async function loadErrosDeCaixa() {
+  if (!API.auth.isAuthenticated()) return;
+  try {
+    const resp = await API.fechamentos.listarFechamentos({
+      size: 100,
+      sort: "data,desc",
+    });
+    const all = resp.content || resp || [];
+    const EPS = 0.009;
+    const inconsistentes = all.filter((f) => Math.abs(f.totalCaixa || 0) > EPS);
+    renderErrosTabela(inconsistentes);
+    atualizarErrosResumo(inconsistentes);
+    prepararErrosFiltros(inconsistentes);
+  } catch (e) {
+    console.error("Erro ao carregar Erros de Caixa:", e);
+    API.showNotification("Erro ao carregar Erros de Caixa", "error");
+  }
+}
+
+function prepararErrosFiltros(base) {
+  const btnAplicar = document.getElementById("erros-aplicar-filtro");
+  const btnLimpar = document.getElementById("erros-limpar-filtro");
+  const btnCSV = document.getElementById("erros-exportar-csv");
+
+  const apply = () => {
+    const ini = document.getElementById("erros-data-inicio").value || null;
+    const fim = document.getElementById("erros-data-fim").value || null;
+    const resp = (document.getElementById("erros-responsavel").value || "")
+      .trim()
+      .toLowerCase();
+
+    const filtered = base.filter((f) => {
+      const d = new Date(f.data);
+      const okIni = ini ? d >= new Date(ini) : true;
+      const okFim = fim ? d <= new Date(fim) : true;
+      const okResp = resp
+        ? String(f.responsavel || "")
+            .toLowerCase()
+            .includes(resp)
+        : true;
+      return okIni && okFim && okResp;
+    });
+
+    renderErrosTabela(filtered);
+    atualizarErrosResumo(filtered);
+    lastErrosFiltered = filtered;
+  };
+
+  btnAplicar && btnAplicar.addEventListener("click", apply);
+  btnLimpar &&
+    btnLimpar.addEventListener("click", () => {
+      document.getElementById("erros-data-inicio").value = "";
+      document.getElementById("erros-data-fim").value = "";
+      document.getElementById("erros-responsavel").value = "";
+      renderErrosTabela(base);
+      atualizarErrosResumo(base);
+      lastErrosFiltered = base;
+    });
+
+  btnCSV &&
+    btnCSV.addEventListener("click", () =>
+      exportErrosCSV(lastErrosFiltered || base),
+    );
+  lastErrosFiltered = base;
+}
+
+function renderErrosTabela(items) {
+  const tbody = document.getElementById("erros-tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  const EPS = 0.009;
+  [...items]
+    .sort((a, b) => new Date(b.data) - new Date(a.data))
+    .forEach((f) => {
+      const isCorreto = Math.abs(f.totalCaixa || 0) <= EPS;
+      const statusLabel = isCorreto ? "Caixa Correto" : "Inconsistente";
+      const statusClass = isCorreto
+        ? "bg-green-100 text-green-800"
+        : "bg-red-100 text-red-800";
+      const motivo = isCorreto
+        ? "Diferença zerada"
+        : f.totalCaixa < 0
+          ? `Faltando ${API.formatCurrency(Math.abs(f.totalCaixa))}`
+          : `Sobrando ${API.formatCurrency(Math.abs(f.totalCaixa))}`;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${API.formatDate(f.data)}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${f.responsavel || "-"}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${API.formatCurrency(f.vendas || 0)}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${API.formatCurrency(f.totalCaixa || 0)}</td>
+      <td class="px-6 py-4 whitespace-nowrap"><span title="${motivo}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusLabel}</span></td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${motivo}</td>`;
+      tbody.appendChild(tr);
+    });
+}
+
+function atualizarErrosResumo(items) {
+  const total = items.length;
+  const sobra = items
+    .filter((i) => (i.totalCaixa || 0) > 0)
+    .reduce((s, i) => s + (i.totalCaixa || 0), 0);
+  const falta = items
+    .filter((i) => (i.totalCaixa || 0) < 0)
+    .reduce((s, i) => s + Math.abs(i.totalCaixa || 0), 0);
+  const elCount = document.getElementById("erros-total-count");
+  const elSobra = document.getElementById("erros-total-sobra");
+  const elFalta = document.getElementById("erros-total-falta");
+  if (elCount) elCount.textContent = String(total);
+  if (elSobra) elSobra.textContent = API.formatCurrency(sobra);
+  if (elFalta) elFalta.textContent = API.formatCurrency(falta);
+}
+
+function exportErrosCSV(items) {
+  const headers = [
+    "Data",
+    "Responsavel",
+    "Vendas",
+    "TotalCaixa",
+    "Status",
+    "Motivo",
+  ];
+  const EPS = 0.009;
+  const rows = items.map((f) => {
+    const isCorreto = Math.abs(f.totalCaixa || 0) <= EPS;
+    const status = isCorreto ? "Caixa Correto" : "Inconsistente";
+    const motivo = isCorreto
+      ? "Diferença zerada"
+      : f.totalCaixa < 0
+        ? `Faltando ${API.formatCurrency(Math.abs(f.totalCaixa))}`
+        : `Sobrando ${API.formatCurrency(Math.abs(f.totalCaixa))}`;
+    return [
+      API.formatDate(f.data),
+      f.responsavel || "-",
+      (f.vendas || 0).toFixed(2),
+      (f.totalCaixa || 0).toFixed(2),
+      status,
+      motivo,
+    ];
+  });
+  const csv = [headers.join(";"), ...rows.map((r) => r.join(";"))].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "erros-de-caixa.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+let lastErrosFiltered = null;
 
 // Format currency
 function formatCurrency(value) {

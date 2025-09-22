@@ -13,6 +13,31 @@ Links úteis:
 
 O projeto está maduro em segurança e base de dados, com Roadmap claro no PRD para evolução do módulo de Fechamentos.
 
+### Padrões de Domínio e Arquitetura (NOVO)
+
+Este projeto adota oficialmente DDD, eventos de domínio e camadas limpas. Regras detalhadas estão em:
+
+- `.github/copilot-rules/project-codification.md` → seção “Domínio e DDD – Regras e Contratos (ADOTAR)”
+- `.github/copilot-rules/project-rules.md` → “ADDENDUM: DDD, Eventos e Camadas (ALINHADO)”
+
+Resumo prático:
+
+- Aggregate Root: Fechamento governa FormasPagamento e Despesas
+- Value Objects: Dinheiro, Inconsistencia, TotalCaixa (imutáveis, BigDecimal escala 2)
+- Eventos: FechamentoFinalizadoEvent abastece projeções (Dashboard/Erros de Caixa)
+- Strategy/Chain: ConsistencyRule + ConsistencyChecker para validações plugáveis
+- DTO↔Domínio: MapStruct; controllers finos
+- Hexagonal: domain/application/infrastructure/presentation
+
+Checklist por PR (obrigatório quando tocar domínio):
+
+- [ ] Usou VO `Dinheiro` (sem BigDecimal cru no domínio)
+- [ ] Publicou `FechamentoFinalizadoEvent` no caso de uso
+- [ ] Regras em `ConsistencyRule` + testes
+- [ ] Consultas de Dashboard/Erros via projeções (quando existirem)
+- [ ] MapStruct para mapeamento; `@Valid` nos DTOs
+- [ ] Logs INFO com mascaramento de sensíveis
+
 ### Concluído
 
 - ✅ Autenticação JWT (Bearer) com perfis: ADMIN, GERENTE, CAIXA; filtros e entrypoint configurados
@@ -25,6 +50,16 @@ O projeto está maduro em segurança e base de dados, com Roadmap claro no PRD p
 ## Tarefas Pendentes (alinhadas ao PRD)
 
 ### Alta Prioridade — Fase A
+
+### Roadmap Incremental para DDD/Eventos (NOVO)
+
+1. Introduzir VOs `Dinheiro` e `Inconsistencia` no domínio (sem alterar contratos externos)
+2. Extrair `ConsistencyChecker` + primeira regra `CaixaZeroRule`
+3. Publicar `FechamentoFinalizadoEvent` em “finalizar fechamento”
+4. Projeção `ErrosDeCaixaProjection` consumindo o evento
+5. MapStruct nos mapeamentos DTO↔Domínio
+6. Ajustar consultas do Dashboard para consumirem projeções (quando disponível)
+7. Testes: VOs (unit), regras (unit), publicação de evento e projeções (integration)
 
 - [ ] Implementar Fechamentos: DTOs (`FechamentoRequest`, `FechamentoResponse`), `FechamentoService`, `FechamentoController`
 - [ ] Idempotência diária: endpoint `/api/fechamentos/diario`, método repo por `(usuarioId, data)`, índice `{ usuarioId: 1, data: 1 }`
