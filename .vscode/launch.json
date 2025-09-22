@@ -2,12 +2,27 @@
   "$schema": "vscode://schemas/launch",
   "version": "0.2.0",
   "configurations": [
+    
+    {
+      "type": "java",
+      "name": "🚀 Fechamento Caixa (Port 8080)",
+      "request": "launch",
+      "mainClass": "com.controle.fechamentocaixa.FechamentoCaixaApplication",
+      "projectName": "fechamento-de-caixa",
+      "args": "",
+      "vmArgs": "-Dserver.port=8080 -Dspring.profiles.active=dev --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false,
+      "internalConsoleOptions": "neverOpen"
+    },
     {
       "type": "java",
       "name": "Debug Spring Boot (MainClass, dev)",
       "request": "launch",
       "mainClass": "com.controle.fechamentocaixa.FechamentoCaixaApplication",
-      "vmArgs": "-Dspring.profiles.active=dev -Dserver.port=8081 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
+      "vmArgs": "-Dspring.profiles.active=dev -Dserver.port=8080 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
       "console": "integratedTerminal"
     },
     {
@@ -25,7 +40,7 @@
       "mainClass": "com.controle.fechamentocaixa.FechamentoCaixaApplication",
       "projectName": "mcpserver-standalone",
       "args": "",
-      "vmArgs": "-Dserver.port=8081 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
+      "vmArgs": "-Dserver.port=8080 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED",
       "envFile": "${workspaceFolder}/.env"
     },
     {

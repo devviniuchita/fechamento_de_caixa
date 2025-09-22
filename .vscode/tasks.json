@@ -10,7 +10,7 @@
       "args": [
         "spring-boot:run",
         "-Dspring-boot.run.profiles=prod",
-        "-Dspring-boot.run.jvmArguments=-Dserver.port=8081 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED"
+        "-Dspring-boot.run.jvmArguments=-Dserver.port=8080 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -26,7 +26,7 @@
       "args": [
         "spring-boot:run",
         "-Dspring-boot.run.profiles=dev",
-        "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=6648 -Dcom.sun.management.jmxremote.rmi.port=6648 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1 -Dserver.port=8081 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED"
+        "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=6648 -Dcom.sun.management.jmxremote.rmi.port=6648 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1 -Dserver.port=8080 --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -35,6 +35,60 @@
         "kind": "build",
         "isDefault": true
       },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Fechamento Caixa (Port 8080)",
+      "type": "shell",
+      "command": "${env:JAVA_HOME}\\bin\\java.exe",
+      "args": [
+        "-Dserver.port=8080",
+        "-Dspring.profiles.active=dev",
+        "--add-opens",
+        "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens",
+        "java.base/java.util=ALL-UNNAMED",
+        "-cp",
+        "${workspaceFolder}/target/classes:${workspaceFolder}/target/dependency/*",
+        "com.controle.fechamentocaixa.FechamentoCaixaApplication"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "JAVA_HOME": "C:\\Program Files\\Java\\jdk-24"
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "dependsOn": "maven-compile",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": {
+        "runOn": "default"
+      },
+      "isBackground": false
+    },
+    {
+      "label": "maven-compile",
+      "type": "shell",
+      "command": "mvnw.cmd",
+      "args": ["compile", "-q"],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "JAVA_HOME": "C:\\Program Files\\Java\\jdk-24"
+        }
+      },
+      "group": "build",
       "problemMatcher": []
     },
     {
@@ -48,6 +102,28 @@
       },
       "group": "test",
       "problemMatcher": []
+    },
+    {
+      "label": "Start (Bash)",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-lc", "./scripts/start.sh"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
     }
   ]
 }
