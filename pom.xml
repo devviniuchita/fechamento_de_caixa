@@ -210,6 +210,7 @@
                 <version>0.1.3</version>
                 <executions>
                     <execution>
+                      <?m2e execute onConfiguration,onIncremental?>
                         <id>editorconfig-format</id>
                         <phase>validate</phase>
                         <goals>
