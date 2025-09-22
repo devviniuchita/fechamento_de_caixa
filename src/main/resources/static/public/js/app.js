@@ -6,6 +6,11 @@
 document.addEventListener("DOMContentLoaded", function () {
   checkAuthentication();
   loadDashboardData();
+  // Bind reset dev button if present
+  const resetBtn = document.getElementById("reset-dev-btn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", openResetDevModal);
+  }
 });
 
 // Authentication check
@@ -14,6 +19,9 @@ function checkAuthentication() {
     showLoginModal();
     return false;
   }
+
+  // Hide login modal if authenticated
+  hideLoginModal();
 
   const user = API.auth.getCurrentUser();
   if (user) {
@@ -25,17 +33,18 @@ function checkAuthentication() {
 
 // Update user info in header
 function updateUserInfo(user) {
-  const userNameElement = document.querySelector(
-    ".flex.items-center.space-x-2 span",
-  );
-  const userRoleElement = document.querySelector(".text-xs.bg-blue-100");
+  const userNameElement = document.querySelector("header .text-sm.font-medium");
+  const userRoleElement = document.querySelector("header .text-xs.bg-blue-100");
   const userAvatarElement = document.querySelector(
-    ".h-8.w-8.rounded-full span",
+    "header .h-8.w-8.rounded-full span",
   );
 
-  if (userNameElement) userNameElement.textContent = user.nome;
-  if (userRoleElement) userRoleElement.textContent = user.perfil;
-  if (userAvatarElement)
+  if (userNameElement && user.nome) userNameElement.textContent = user.nome;
+  const perfilLabel =
+    user.perfil || (Array.isArray(user.perfis) && user.perfis[0]) || "USER";
+  if (userRoleElement)
+    userRoleElement.textContent = String(perfilLabel).replace(/^ROLE_/i, "");
+  if (userAvatarElement && user.nome)
     userAvatarElement.textContent = user.nome.charAt(0).toUpperCase();
 }
 
@@ -491,3 +500,52 @@ document.getElementById("data").valueAsDate = new Date();
 calculateTotals();
 
 console.log("✅ App.js loaded successfully");
+
+// ===============================
+// Reset DEV UI functions
+// ===============================
+function openResetDevModal() {
+  const modal = document.getElementById("reset-dev-modal");
+  const output = document.getElementById("reset-dev-output");
+  if (output) output.textContent = "";
+  if (modal) modal.classList.remove("hidden");
+}
+
+function closeResetDevModal() {
+  const modal = document.getElementById("reset-dev-modal");
+  if (modal) modal.classList.add("hidden");
+}
+
+async function runResetDev() {
+  try {
+    API.showLoading(true);
+    const output = document.getElementById("reset-dev-output");
+    if (output) {
+      output.textContent = "Executando reset...\n";
+    }
+
+    const result = await API.test.resetDev();
+
+    // Pretty print result
+    if (output) {
+      output.textContent = JSON.stringify(result, null, 2);
+    }
+
+    API.showNotification("Reset DEV executado com sucesso.", "success");
+
+    // Se usuário foi recriado, atualiza UI de login
+    showLoginModal();
+  } catch (error) {
+    console.error("Erro ao executar Reset DEV:", error);
+    const output = document.getElementById("reset-dev-output");
+    if (output) {
+      output.textContent = `Erro: ${error.message || "Falha na execução"}`;
+    }
+    API.showNotification(
+      error.message || "Falha ao executar Reset DEV",
+      "error",
+    );
+  } finally {
+    API.showLoading(false);
+  }
+}

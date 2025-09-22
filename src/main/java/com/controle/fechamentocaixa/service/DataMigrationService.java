@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -21,6 +22,7 @@ import com.controle.fechamentocaixa.repository.UsuarioRepository;
  * Serviço para migração de dados e inicialização do sistema
  */
 @Service
+@Profile("migration")
 public class DataMigrationService implements CommandLineRunner {
 
   private static final Logger logger = LoggerFactory.getLogger(DataMigrationService.class);

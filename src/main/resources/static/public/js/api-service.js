@@ -26,6 +26,7 @@ const API_CONFIG = {
       public: "/test/public",
       user: "/test/user",
       admin: "/test/admin",
+      resetDev: "/test/reset-dev",
     },
   },
 };
@@ -77,7 +78,9 @@ class BaseAPI {
       Accept: "application/json",
     };
 
-    if (token) {
+    // optionally skip auth header (e.g., login)
+    const skipAuth = options.skipAuth === true;
+    if (token && !skipAuth) {
       defaultHeaders["Authorization"] = `Bearer ${token}`;
     }
 
@@ -178,18 +181,25 @@ class APIError extends Error {
 class AuthAPI extends BaseAPI {
   async login(email, senha) {
     try {
-      const response = await this.post(API_CONFIG.endpoints.auth.login, {
-        email,
-        senha,
+      const response = await this.request(API_CONFIG.endpoints.auth.login, {
+        method: "POST",
+        body: { email, senha },
+        skipAuth: true,
       });
 
       if (response.token) {
         TokenManager.setToken(response.token);
+        const perfis = response.perfis || response.roles || [];
+        const perfilLabel =
+          Array.isArray(perfis) && perfis.length
+            ? perfis[0].replace(/^ROLE_/i, "")
+            : "USER";
         TokenManager.setUser({
           id: response.id,
           nome: response.nome,
           email: response.email,
-          perfil: response.perfil,
+          perfil: perfilLabel,
+          perfis,
         });
       }
 
@@ -329,6 +339,10 @@ class TestAPI extends BaseAPI {
 
   async testAdmin() {
     return this.get(API_CONFIG.endpoints.test.admin);
+  }
+
+  async resetDev() {
+    return this.post(API_CONFIG.endpoints.test.resetDev, {});
   }
 }
 

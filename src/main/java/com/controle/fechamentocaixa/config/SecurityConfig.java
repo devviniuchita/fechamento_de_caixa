@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,22 +43,6 @@ public class SecurityConfig {
   }
 
   /**
-   * Configuração do provedor de autenticação com API moderna
-   *
-   * @return Provedor de autenticação DAO configurado
-   */
-  @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
-    // Usar setters modernos diretamente
-    authProvider.setUserDetailsService(userDetailsService);
-    authProvider.setPasswordEncoder(passwordEncoder());
-
-    return authProvider;
-  }
-
-  /**
    * Configuração do gerenciador de autenticação
    *
    * @param authConfig Configuração de autenticação
@@ -93,17 +76,19 @@ public class SecurityConfig {
     http.csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        // Registra o UserDetailsService para a autenticação baseada em DAO (moderno)
+        .userDetailsService(userDetailsService)
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/", "/index.html", "/*.html", "/*.css", "/*.js").permitAll()
+            .requestMatchers("/favicon.ico").permitAll()
             .requestMatchers("/public/**", "/css/**", "/js/**", "/images/**", "/fonts/**").permitAll()
             .requestMatchers("/auth/**").permitAll()
+            .requestMatchers("/test/**").permitAll()
             .requestMatchers("/test/public").permitAll()
             .requestMatchers("/test/fix-passwords").permitAll()
             .requestMatchers("/test/password-status").permitAll()
             .requestMatchers("/test/health").permitAll()
             .anyRequest().authenticated());
-
-    http.authenticationProvider(authenticationProvider());
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();

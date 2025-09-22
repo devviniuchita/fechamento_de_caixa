@@ -8,16 +8,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Modelo de usuário para autenticação e autorização no sistema
  */
 @Document(collection = "usuarios")
 @Data
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class Usuario {
 
   @Id
@@ -30,10 +29,8 @@ public class Usuario {
 
   private String senha; // Armazenada com BCrypt
 
-  @Builder.Default
   private Set<Perfil> perfis = new HashSet<>();
 
-  @Builder.Default
   private boolean ativo = true;
 
   private LocalDateTime dataCriacao;

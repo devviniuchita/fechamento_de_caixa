@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import com.controle.fechamentocaixa.repository.UsuarioRepository;
  * Serviço para inicialização de usuários
  */
 @Service
+@Profile("userinit")
 @Order(2) // Execute after DataMigrationService
 public class UserInitService implements CommandLineRunner {
 
@@ -47,11 +49,15 @@ public class UserInitService implements CommandLineRunner {
   private void fixExistingUsers() {
     try {
       usuarioRepository.findAll().forEach(user -> {
-        if (!user.getSenha().startsWith("$2a$") && !user.getSenha().startsWith("$2b$")) {
-          logger.info("Fixing password for user: {}", user.getEmail());
-          user.setSenha(passwordEncoder.encode(user.getSenha()));
-          usuarioRepository.save(user);
-          logger.info("Password fixed for user: {}", user.getEmail());
+        String pwd = user.getSenha();
+        if (pwd != null && !pwd.isBlank()) {
+          boolean alreadyEncoded = pwd.startsWith("$2a$") || pwd.startsWith("$2b$") || pwd.startsWith("$2y$");
+          if (!alreadyEncoded) {
+            logger.info("Fixing password for user: {}", user.getEmail());
+            user.setSenha(passwordEncoder.encode(user.getSenha()));
+            usuarioRepository.save(user);
+            logger.info("Password fixed for user: {}", user.getEmail());
+          }
         }
       });
     } catch (Exception e) {

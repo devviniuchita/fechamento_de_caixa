@@ -5,6 +5,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sistema de Fechamento de Caixa</title>
+    <!-- Favicons: múltiplas opções para evitar warnings de /favicon.ico -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='20' ry='20' fill='%230256a1'/%3E%3Ctext x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='64' fill='white' font-family='Arial, Helvetica, sans-serif'%3E%C2%A4%3C/text%3E%3C/svg%3E"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAx0lEQVRYhe2WsQ3CMBBF30wC2b9s4M0gJrBQj2BqGQ0WQm0C1yO2Qq3gOqkq9lN2RZy8pCj8u3t3k3s2G7Qb+2Q0q9mM1yC7mC2p0b8kQwC2zH8mXr4q8H0h0z7dS6lQF2n5gKQWwT6Q8G1l9vHf4wFv0o9qB0Jm3w4l8RQLcQF3m9oGtzp0cC1i0R2Qm2zq3o1eZ2v8o8Z0EWvRr8gq3S3N8Kxkq7iY3N6QnGEzvS8gT1q1Qe4Hq4Rj1oWg9jvGq2l6rWmA9jZqQ0mYJmX2v9cQFQ2YVg3w4Hq1xT1Kc2Q9rC0oCw1o2wE7S1G4n2wQqgHc9Qh9mQn6c4AAAAAElFTkSuQmCC"
+    />
+    <link rel="shortcut icon" href="/favicon.ico" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/public/css/style.css" />
     <link
@@ -124,6 +137,15 @@
               </h1>
             </div>
             <div class="flex items-center space-x-4">
+              <!-- Reset DEV button -->
+              <button
+                id="reset-dev-btn"
+                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-md text-sm no-print"
+                onclick="openResetDevModal()"
+                title="Reset DEV: wipe + ensure admin + sanity checks"
+              >
+                <i class="fas fa-rotate"></i> Reset DEV
+              </button>
               <div class="relative">
                 <button class="p-2 rounded-full hover:bg-gray-100">
                   <i class="fas fa-bell text-gray-600"></i>
@@ -164,7 +186,7 @@
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-gray-500">Fechamentos Hoje</p>
-                    <h3 class="text-2xl font-bold">1</h3>
+                    <h3 class="text-2xl font-bold">0</h3>
                   </div>
                   <div class="p-3 rounded-full bg-blue-100 text-blue-600">
                     <i class="fas fa-calendar-day text-xl"></i>
@@ -175,7 +197,7 @@
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-gray-500">Total Vendas</p>
-                    <h3 class="text-2xl font-bold">R$ 250,00</h3>
+                    <h3 class="text-2xl font-bold">R$ 0,00</h3>
                   </div>
                   <div class="p-3 rounded-full bg-green-100 text-green-600">
                     <i class="fas fa-money-bill-wave text-xl"></i>
@@ -186,7 +208,7 @@
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-gray-500">Inconsistências</p>
-                    <h3 class="text-2xl font-bold">1</h3>
+                    <h3 class="text-2xl font-bold">0</h3>
                   </div>
                   <div class="p-3 rounded-full bg-red-100 text-red-600">
                     <i class="fas fa-exclamation-triangle text-xl"></i>
@@ -259,8 +281,8 @@
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         <span
-                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
-                          >Inconsistente</span
+                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                          >OK</span
                         >
                       </td>
                     </tr>
@@ -1672,8 +1694,52 @@
       </div>
     </div>
 
+    <!-- Reset DEV Modal -->
+    <div
+      id="reset-dev-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    >
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-gray-800">Reset DEV</h2>
+          <button
+            onclick="closeResetDevModal()"
+            class="text-gray-500 hover:text-gray-700"
+            title="Fechar"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        <p class="text-sm text-gray-600 mb-3">Esta rotina irá:</p>
+        <ul class="list-disc pl-6 text-sm text-gray-700 mb-4">
+          <li>Apagar a coleção de usuários (wipe)</li>
+          <li>Recriar o usuário admin@test.com / admin123</li>
+          <li>Executar verificações de sanidade e autenticação</li>
+        </ul>
+        <div
+          id="reset-dev-output"
+          class="bg-gray-100 rounded p-3 text-xs font-mono overflow-auto max-h-80"
+        ></div>
+        <div class="mt-4 flex justify-end space-x-2">
+          <button
+            onclick="closeResetDevModal()"
+            class="px-3 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
+          >
+            Fechar
+          </button>
+          <button
+            id="run-reset-dev-btn"
+            onclick="runResetDev()"
+            class="px-3 py-2 rounded bg-yellow-500 hover:bg-yellow-600 text-white"
+          >
+            Executar Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="public/js/api-service.js"></script>
-    <script src="public/js/app.js"></script>
+    <script src="/public/js/api-service.js"></script>
+    <script src="/public/js/app.js"></script>
   </body>
 </html>

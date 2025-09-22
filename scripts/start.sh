@@ -29,6 +29,11 @@ RUN_LOG="$LOG_DIR/app.log"
 : > "$BUILD_LOG"
 : > "$RUN_LOG"
 
+# 0) Garantir que não há processo antigo na porta
+if [ -f "$PROJECT_DIR/scripts/stop.sh" ]; then
+  bash "$PROJECT_DIR/scripts/stop.sh" 8080 || true
+fi
+
 echo "[INFO] Empacotando aplicação (sem testes)..."
 # 5) Empacotar JAR usando o wrapper do Maven via cmd.exe (mais estável no Windows)
 #    Importante: não passar JAVA_HOME Unix para cmd.exe (causa erro). Desexportar temporariamente.

@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -168,6 +170,38 @@ public class GlobalExceptionHandler {
         null);
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<ErrorResponse> handleBadCredentials(
+      BadCredentialsException ex, WebRequest request) {
+
+    log.warn("Credenciais inválidas: {}", ex.getMessage());
+
+    ErrorResponse errorResponse = createErrorResponse(
+        HttpStatus.UNAUTHORIZED,
+        "Não autorizado",
+        "Email ou senha inválidos",
+        getPath(request),
+        null);
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<ErrorResponse> handleAuthException(
+      AuthenticationException ex, WebRequest request) {
+
+    log.warn("Falha de autenticação: {}", ex.getMessage());
+
+    ErrorResponse errorResponse = createErrorResponse(
+        HttpStatus.UNAUTHORIZED,
+        "Não autorizado",
+        ex.getMessage(),
+        getPath(request),
+        null);
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
   }
 
   @ExceptionHandler(Exception.class)

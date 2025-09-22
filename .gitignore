@@ -524,6 +524,7 @@ PRD.md
 .vercel
 .vscode/ide_config.json
 playground-1.mongodb.js
+.playwright-mcp/
 
 # GitHub specific files (keep essential workflows, ignore others)
 .github/chatmodes/

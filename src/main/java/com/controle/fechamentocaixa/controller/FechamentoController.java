@@ -20,12 +20,9 @@ import jakarta.validation.Valid;
  * Controller REST para operações de fechamento de caixa
  * Implementa todos os endpoints com autenticação e autorização adequadas
  */
-// @RestController
-// @RequestMapping("/api/fechamentos")
-// @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'CAIXA')")
-// @Tag(name = "Fechamento de Caixa", description = "Operações de fechamento de
-// caixa diário")
-// @SecurityRequirement(name = "Bearer Authentication")
+@RestController
+@RequestMapping("/api/fechamentos")
+@PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'CAIXA')")
 public class FechamentoController {
 
   private static final Logger log = LoggerFactory.getLogger(FechamentoController.class);
