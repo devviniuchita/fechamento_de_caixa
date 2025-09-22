@@ -3,79 +3,82 @@ package com.controle.fechamentocaixa.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.controle.fechamentocaixa.model.Perfil;
 import com.controle.fechamentocaixa.model.Usuario;
 
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@DataMongoTest
+@Testcontainers
 public class UsuarioRepositoryTest {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+  @Container
+  @ServiceConnection
+  static MongoDBContainer mongo = new MongoDBContainer("mongo:6.0.8");
 
-    private Usuario usuario;
+  @Autowired
+  private UsuarioRepository usuarioRepository;
 
-    @BeforeEach
-    void setup() {
-        // Limpa o repositório antes de cada teste
-        usuarioRepository.deleteAll();
+  private Usuario usuario;
 
-        // Configura um usuário para testes
-        Set<Perfil> perfis = new HashSet<>();
-        perfis.add(Perfil.CAIXA);
+  @BeforeEach
+  void setup() {
+    // Limpa o repositório antes de cada teste
+    usuarioRepository.deleteAll();
 
-        usuario = new Usuario();
-        usuario.setEmail("teste@example.com");
-        usuario.setNome("Usuário Teste");
-        usuario.setSenha("senha123");
-        usuario.setPerfis(perfis);
-        usuario.setAtivo(true);
-        usuario.setDataCriacao(LocalDateTime.now());
+    // Configura um usuário para testes
+    Set<Perfil> perfis = new HashSet<>();
+    perfis.add(Perfil.CAIXA);
 
-        // Salva o usuário no repositório
-        usuario = usuarioRepository.save(usuario);
-    }
+    usuario = new Usuario();
+    usuario.setEmail("teste@example.com");
+    usuario.setNome("Usuário Teste");
+    usuario.setSenha("senha123");
+    usuario.setPerfis(perfis);
+    usuario.setAtivo(true);
+    usuario.setDataCriacao(LocalDateTime.now());
 
-    @Test
-    @DisplayName("Deve encontrar usuário pelo email")
-    void deveEncontrarUsuarioPeloEmail() {
-        // Arrange - já feito no setup
+    // Salva o usuário no repositório
+    usuario = usuarioRepository.save(usuario);
+  }
 
-        // Act
-        Optional<Usuario> usuarioEncontrado = usuarioRepository.findByEmail("teste@example.com");
+  @Test
+  @DisplayName("Deve encontrar usuário pelo email")
+  void deveEncontrarUsuarioPeloEmail() {
+    // Arrange - já feito no setup
 
-        // Assert
-        assertThat(usuarioEncontrado).isPresent();
-        assertThat(usuarioEncontrado.get().getEmail()).isEqualTo("teste@example.com");
-        assertThat(usuarioEncontrado.get().getNome()).isEqualTo("Usuário Teste");
-    }
+    // Act
+    Optional<Usuario> usuarioEncontrado = usuarioRepository.findByEmail("teste@example.com");
 
-    @Test
-    @DisplayName("Não deve encontrar usuário com email inexistente")
-    void naoDeveEncontrarUsuarioComEmailInexistente() {
-        // Act
-        Optional<Usuario> usuarioEncontrado = usuarioRepository.findByEmail("inexistente@example.com");
+    // Assert
+    assertThat(usuarioEncontrado).isPresent();
+    assertThat(usuarioEncontrado.get().getEmail()).isEqualTo("teste@example.com");
+    assertThat(usuarioEncontrado.get().getNome()).isEqualTo("Usuário Teste");
+  }
 
-        // Assert
-        assertThat(usuarioEncontrado).isEmpty();
-    }
+  @Test
+  @DisplayName("Não deve encontrar usuário com email inexistente")
+  void naoDeveEncontrarUsuarioComEmailInexistente() {
+    // Act
+    Optional<Usuario> usuarioEncontrado = usuarioRepository.findByEmail("inexistente@example.com");
 
-    @Test
-    @DisplayName("Deve verificar existência de usuário pelo email")
-    void deveVerificarExistenciaDeUsuarioPeloEmail() {
-        // Act & Assert
-        assertThat(usuarioRepository.existsByEmail("teste@example.com")).isTrue();
-        assertThat(usuarioRepository.existsByEmail("inexistente@example.com")).isFalse();
-    }
+    // Assert
+    assertThat(usuarioEncontrado).isEmpty();
+  }
+
+  @Test
+  @DisplayName("Deve verificar existência de usuário pelo email")
+  void deveVerificarExistenciaDeUsuarioPeloEmail() {
+    // Act & Assert
+    assertThat(usuarioRepository.existsByEmail("teste@example.com")).isTrue();
+    assertThat(usuarioRepository.existsByEmail("inexistente@example.com")).isFalse();
+  }
 }

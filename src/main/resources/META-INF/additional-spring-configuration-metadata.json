@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "app.google.drive.credentials-file",
+  "type": "java.lang.String",
+  "description": "A description for 'app.google.drive.credentials-file'"
+}]}
