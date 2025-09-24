@@ -7,7 +7,7 @@ on:
     branches: [main]
   schedule:
     # Executa todo dia às 02:00 UTC
-    - cron: '0 2 * * *'
+    - cron: "0 2 * * *"
 
 jobs:
   gitleaks:
@@ -17,12 +17,12 @@ jobs:
       contents: read
       issues: write
       pull-requests: write
-    
+
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Busca histórico completo
+          fetch-depth: 0 # Busca histórico completo
 
       - name: 🔐 Run Gitleaks scan
         uses: gitleaks/gitleaks-action@v2
@@ -49,17 +49,17 @@ jobs:
               repo: context.repo.repo,
               title: '🚨 SECRETS DETECTED - Immediate Action Required',
               body: `**⚠️ SECURITY ALERT: Secrets were found in the repository!**
-              
+
               🔍 **Commit:** ${context.sha}
               📅 **Date:** ${new Date().toISOString()}
               🌿 **Branch:** ${context.ref}
-              
+
               **📋 Action Items:**
               1. Download the Gitleaks report from the failed workflow
               2. Identify and rotate any exposed credentials immediately
               3. Remove secrets from the repository
               4. Update this issue when resolved
-              
+
               **📎 Workflow:** ${context.payload.html_url}`,
               labels: ['security', 'critical', 'secrets']
             })

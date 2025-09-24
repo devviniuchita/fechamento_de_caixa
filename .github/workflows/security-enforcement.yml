@@ -16,26 +16,26 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
-    
+
     steps:
       - name: 🚨 Comment on fork PR
         uses: actions/github-script@v7
         with:
           script: |
             const comment = `🚫 **Fork PR Security Block**
-            
+
             This PR originates from a forked repository and has been automatically blocked from accessing deployment secrets for security reasons.
-            
+
             **For maintainers:**
             - Review the code changes carefully
             - Test locally before merging
             - Only trusted contributors should have their PRs manually approved for deployment
-            
+
             **For contributors:**
             - Your PR will be reviewed but won't trigger deployments automatically
             - This is a security measure to protect repository secrets
             `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -61,7 +61,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    
+
     steps:
       - name: 📥 Checkout PR
         uses: actions/checkout@v4
@@ -85,18 +85,18 @@ jobs:
             "Dockerfile*"
             "docker-compose*"
           )
-          
+
           # Verifica se algum arquivo modificado corresponde aos padrões
           CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
           SENSITIVE_CHANGED=""
-          
+
           for pattern in "${SENSITIVE_PATTERNS[@]}"; do
             MATCHES=$(echo "$CHANGED_FILES" | grep -E "$pattern" || true)
             if [ ! -z "$MATCHES" ]; then
               SENSITIVE_CHANGED="$SENSITIVE_CHANGED\n$MATCHES"
             fi
           done
-          
+
           if [ ! -z "$SENSITIVE_CHANGED" ]; then
             echo "sensitive_found=true" >> $GITHUB_OUTPUT
             echo "sensitive_files<<EOF" >> $GITHUB_OUTPUT
@@ -113,22 +113,22 @@ jobs:
           script: |
             const sensitiveFiles = `${{ steps.check-files.outputs.sensitive_files }}`;
             const comment = `⚠️ **Sensitive Files Modified**
-            
+
             This PR modifies files that may contain or affect sensitive information:
-            
+
             \`\`\`
             ${sensitiveFiles}
             \`\`\`
-            
+
             **Security Review Required:**
             - [ ] No secrets or credentials are exposed
             - [ ] Workflows don't leak sensitive information in logs
             - [ ] Configuration changes maintain security standards
             - [ ] Changes are necessary and minimal
-            
+
             Please ensure all security implications have been considered before merging.
             `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
