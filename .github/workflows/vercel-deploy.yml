@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: 🚀 Deploy to Vercel
 
 on:
   pull_request:
@@ -10,77 +10,134 @@ concurrency:
   group: vercel-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# 🔐 Security: This workflow blocks fork PRs from accessing secrets
+# Required secrets: VERCEL_TOKEN (Personal access token from Vercel)
+# Optional: VERCEL_PROJECT_ID, VERCEL_ORG_ID for faster linking
+
 jobs:
   preview:
-    name: Preview (PR)
+    name: 🔍 Preview Deploy (PR)
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: 🛡️ Security check - Block fork PRs
+        id: security_check
+        run: |
+          # Block PRs from forks to prevent secret exposure
+          if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+            echo "🚫 Fork PR detected: ${{ github.event.pull_request.head.repo.full_name }}"
+            echo "🔐 Skipping preview deploy for security (no access to secrets)"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "reason=fork" >> "$GITHUB_OUTPUT"
+          elif [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "⚠️ Vercel secrets not configured"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "reason=no_secrets" >> "$GITHUB_OUTPUT"
+          else
+            echo "✅ Security check passed"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "reason=none" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 💬 Comment on fork PR
+        if: steps.security_check.outputs.reason == 'fork'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚫 **Fork PR - Preview Deploy Blocked**
+
+              This PR originates from a fork and preview deployment has been blocked for security reasons.
+
+              **For maintainers:** Preview deploys are disabled for fork PRs to prevent secret exposure. Test changes locally or create the PR from a branch in the main repository.`
+            })
+
+      - name: ⚙️ Setup Node.js
+        if: steps.security_check.outputs.skip == 'false'
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install Vercel CLI
+      - name: 📦 Install Vercel CLI
+        if: steps.security_check.outputs.skip == 'false'
         run: npm i -g vercel@latest
 
-      - name: Deploy Preview to Vercel
+      - name: 🚀 Deploy Preview to Vercel
         id: deploy
+        if: steps.security_check.outputs.skip == 'false'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          if [ -z "$VERCEL_TOKEN" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Vercel secrets ausentes; pulando deploy de preview."
-            exit 0
-          fi
-          # Link o projeto por nome para evitar necessidade de VERCEL_ORG_ID/PROJECT_ID
-          vercel link --yes --project "fechamento-de-caixa" --token "$VERCEL_TOKEN"
-          vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
-          DEPLOY_URL=$(vercel deploy . --yes --token "$VERCEL_TOKEN")
-          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
-          echo "skip=false" >> "$GITHUB_OUTPUT"
+          # Link project (non-interactive, secure)
+          vercel link --yes --project "fechamento-de-caixa" --token "$VERCEL_TOKEN" 2>/dev/null
+          vercel pull --yes --environment=preview --token "$VERCEL_TOKEN" 2>/dev/null
 
-      - name: Comentar URL no PR
-        if: ${{ steps.deploy.outputs.skip == 'false' && steps.deploy.outputs.url != '' }}
+          # Deploy and capture URL (avoid logging tokens)
+          DEPLOY_URL=$(vercel deploy . --yes --token "$VERCEL_TOKEN" 2>/dev/null)
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+          echo "✅ Preview deployed successfully"
+
+      - name: 💬 Comment preview URL
+        if: steps.security_check.outputs.skip == 'false' && steps.deploy.outputs.url != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           PR_NUMBER="${{ github.event.number }}"
-          BODY="🚀 Preview Vercel disponível%0A%0A✅ URL: ${{ steps.deploy.outputs.url }}%0A🧩 Commit: ${{ github.sha }}"
+          DEPLOY_URL="${{ steps.deploy.outputs.url }}"
+          BODY="🚀 **Preview Deployment Ready**%0A%0A✅ **URL:** $DEPLOY_URL%0A🧩 **Commit:** \`${{ github.sha }}\`%0A🔗 **Branch:** \`${{ github.head_ref }}\`"
           gh pr comment "$PR_NUMBER" --body "$BODY"
 
   production:
-    name: Production (main)
+    name: 🌐 Production Deploy
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    environment: production
+    environment:
+      name: production
+      url: https://fechamento-de-caixa.vercel.app
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: 🔐 Validate secrets
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "❌ VERCEL_TOKEN not configured in GitHub Secrets"
+            echo "📝 Configure in: Repository Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+          echo "✅ Vercel secrets validated"
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install Vercel CLI
+      - name: 📦 Install Vercel CLI
         run: npm i -g vercel@latest
 
-      - name: Deploy Production to Vercel
+      - name: 🌐 Deploy to Production
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          if [ -z "$VERCEL_TOKEN" ]; then
-            echo "Segredos do Vercel não configurados; não é possível fazer deploy de produção."
-            exit 1
-          fi
-          # Link o projeto por nome para evitar necessidade de VERCEL_ORG_ID/PROJECT_ID
-          vercel link --yes --project "fechamento-de-caixa" --token "$VERCEL_TOKEN"
-          vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
-          DEPLOY_URL=$(vercel deploy . --yes --prod --token "$VERCEL_TOKEN")
-          echo "🚀 Production deployed: $DEPLOY_URL"
+          echo "🔗 Linking project..."
+          vercel link --yes --project "fechamento-de-caixa" --token "$VERCEL_TOKEN" 2>/dev/null
+
+          echo "📥 Pulling production configuration..."
+          vercel pull --yes --environment=production --token "$VERCEL_TOKEN" 2>/dev/null
+
+          echo "🚀 Deploying to production..."
+          DEPLOY_URL=$(vercel deploy . --yes --prod --token "$VERCEL_TOKEN" 2>/dev/null)
+
+          echo "✅ Production deployment successful!"
+          echo "🌐 Live URL: $DEPLOY_URL"

@@ -1,0 +1,65 @@
+name: 🔐 Secret Scanning (gitleaks)
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Executa todo dia às 02:00 UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  gitleaks:
+    name: 🔍 Scan for secrets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Busca histórico completo
+
+      - name: 🔐 Run Gitleaks scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --verbose --redact
+
+      - name: 📊 Upload Gitleaks report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report-${{ github.sha }}
+          path: gitleaks-report.json
+          retention-days: 30
+
+      - name: 🚨 Create issue if secrets found
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 SECRETS DETECTED - Immediate Action Required',
+              body: `**⚠️ SECURITY ALERT: Secrets were found in the repository!**
+              
+              🔍 **Commit:** ${context.sha}
+              📅 **Date:** ${new Date().toISOString()}
+              🌿 **Branch:** ${context.ref}
+              
+              **📋 Action Items:**
+              1. Download the Gitleaks report from the failed workflow
+              2. Identify and rotate any exposed credentials immediately
+              3. Remove secrets from the repository
+              4. Update this issue when resolved
+              
+              **📎 Workflow:** ${context.payload.html_url}`,
+              labels: ['security', 'critical', 'secrets']
+            })

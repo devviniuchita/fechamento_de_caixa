@@ -1,0 +1,106 @@
+package com.controle.fechamentocaixa.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import com.controle.fechamentocaixa.dto.UsuarioResponse;
+import com.controle.fechamentocaixa.exception.ResourceNotFoundException;
+import com.controle.fechamentocaixa.model.Usuario;
+import com.controle.fechamentocaixa.repository.UsuarioRepository;
+import com.controle.fechamentocaixa.security.services.UserDetailsImpl;
+import com.controle.fechamentocaixa.service.UsuarioService;
+
+import jakarta.validation.Valid;
+
+/**
+ * Controller para operações com usuários
+ */
+@RestController
+@RequestMapping("/usuarios")
+public class UsuarioController {
+
+  @Autowired
+  private UsuarioRepository usuarioRepository;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private UsuarioService usuarioService;
+
+  @GetMapping
+  @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE')")
+  public List<UsuarioResponse> listarUsuarios() {
+    return usuarioService.listarUsuarios();
+  }
+
+  @GetMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or #id == authentication.principal.id")
+  public ResponseEntity<UsuarioResponse> buscarUsuario(@PathVariable String id) {
+    return ResponseEntity.ok(usuarioService.buscarUsuarioPorId(id));
+  }
+
+  @PatchMapping("/{id}/ativar")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> ativarUsuario(@PathVariable String id) {
+    usuarioService.atualizarStatusAtivacao(id, true);
+    return ResponseEntity.ok("Usuário ativado com sucesso!");
+  }
+
+  @PatchMapping("/{id}/desativar")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> desativarUsuario(@PathVariable String id) {
+    Usuario usuario = usuarioRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + id));
+
+    if (usuario.isAdmin() && contarAdminsAtivos() <= 1) {
+      return ResponseEntity.badRequest().body("Não é possível desativar o último administrador!");
+    }
+
+    usuarioService.atualizarStatusAtivacao(id, false);
+    return ResponseEntity.ok("Usuário desativado com sucesso!");
+  }
+
+  @PatchMapping("/{id}/senha")
+  @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+  public ResponseEntity<?> alterarSenha(@PathVariable String id, @Valid @RequestBody AlteraSenhaRequest request) {
+    Usuario usuario = usuarioRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + id));
+
+    UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")) &&
+        !id.equals(userDetails.getId())) {
+      return ResponseEntity.badRequest().body("Você não tem permissão para alterar a senha deste usuário!");
+    }
+
+    usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
+    usuarioRepository.save(usuario);
+
+    return ResponseEntity.ok("Senha alterada com sucesso!");
+  }
+
+  private long contarAdminsAtivos() {
+    return usuarioRepository.findAll().stream()
+        .filter(u -> u.isAtivo() && u.isAdmin())
+        .count();
+  }
+
+  public static class AlteraSenhaRequest {
+    private String novaSenha;
+
+    public String getNovaSenha() {
+      return novaSenha;
+    }
+
+    public void setNovaSenha(String novaSenha) {
+      this.novaSenha = novaSenha;
+    }
+  }
+}

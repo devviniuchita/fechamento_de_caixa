@@ -1,0 +1,149 @@
+name: 🛡️ Security Enforcement
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Bloqueia PRs de forks se tentarem acessar secrets
+  fork-protection:
+    name: 🚫 Block fork PRs from accessing secrets
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.fork == true
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    
+    steps:
+      - name: 🚨 Comment on fork PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = `🚫 **Fork PR Security Block**
+            
+            This PR originates from a forked repository and has been automatically blocked from accessing deployment secrets for security reasons.
+            
+            **For maintainers:**
+            - Review the code changes carefully
+            - Test locally before merging
+            - Only trusted contributors should have their PRs manually approved for deployment
+            
+            **For contributors:**
+            - Your PR will be reviewed but won't trigger deployments automatically
+            - This is a security measure to protect repository secrets
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
+
+      - name: 🏷️ Label fork PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['fork-pr', 'security-blocked', 'needs-review']
+            })
+
+  # Verifica se PRs modificam arquivos sensíveis
+  sensitive-files-check:
+    name: 🔍 Check for sensitive file changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: 📥 Checkout PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: 🔍 Check for sensitive files
+        id: check-files
+        run: |
+          # Lista de padrões de arquivos sensíveis
+          SENSITIVE_PATTERNS=(
+            "*.env*"
+            "*secret*"
+            "*key*"
+            "*.pem"
+            "*.p12"
+            "*.jks"
+            ".github/workflows/*.yml"
+            ".github/workflows/*.yaml"
+            "Dockerfile*"
+            "docker-compose*"
+          )
+          
+          # Verifica se algum arquivo modificado corresponde aos padrões
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+          SENSITIVE_CHANGED=""
+          
+          for pattern in "${SENSITIVE_PATTERNS[@]}"; do
+            MATCHES=$(echo "$CHANGED_FILES" | grep -E "$pattern" || true)
+            if [ ! -z "$MATCHES" ]; then
+              SENSITIVE_CHANGED="$SENSITIVE_CHANGED\n$MATCHES"
+            fi
+          done
+          
+          if [ ! -z "$SENSITIVE_CHANGED" ]; then
+            echo "sensitive_found=true" >> $GITHUB_OUTPUT
+            echo "sensitive_files<<EOF" >> $GITHUB_OUTPUT
+            echo -e "$SENSITIVE_CHANGED" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "sensitive_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🚨 Comment on sensitive file changes
+        if: steps.check-files.outputs.sensitive_found == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sensitiveFiles = `${{ steps.check-files.outputs.sensitive_files }}`;
+            const comment = `⚠️ **Sensitive Files Modified**
+            
+            This PR modifies files that may contain or affect sensitive information:
+            
+            \`\`\`
+            ${sensitiveFiles}
+            \`\`\`
+            
+            **Security Review Required:**
+            - [ ] No secrets or credentials are exposed
+            - [ ] Workflows don't leak sensitive information in logs
+            - [ ] Configuration changes maintain security standards
+            - [ ] Changes are necessary and minimal
+            
+            Please ensure all security implications have been considered before merging.
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
+
+      - name: 🏷️ Label sensitive PR
+        if: steps.check-files.outputs.sensitive_found == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['sensitive-files', 'security-review-required']
+            })

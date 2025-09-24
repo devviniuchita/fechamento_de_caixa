@@ -542,3 +542,4 @@ playground-1.mongodb.js
 .github/workflows/playwright.yml
 .vercel
 !docs/ci-vercel-check.md
+Tasklist.md

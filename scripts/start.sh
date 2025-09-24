@@ -7,11 +7,19 @@ PROJECT_DIR="$(cd "$(dirname "$0")"/.. && pwd)"
 cd "$PROJECT_DIR"
 
 # 2) JAVA_HOME e PATH (Git Bash precisa disso)
+# Updated: Use JAVA_HOME from environment if set, otherwise fallback to documented JDK 17
 JAVA_HOME_WIN="C:\\Program Files\\Java\\jdk-24"
-if command -v cygpath >/dev/null 2>&1; then
-  JAVA_HOME="$(cygpath -u "$JAVA_HOME_WIN")"
+if [ -n "${JAVA_HOME}" ]; then
+  echo "Using JAVA_HOME from environment: ${JAVA_HOME}"
 else
-  JAVA_HOME="/c/Program Files/Java/jdk-24"
+  echo "Warning: JAVA_HOME not set. This script previously used JDK 24 for Windows. For consistent build across environments prefer JDK 17 to match pom.xml and CI."
+  # Keep legacy fallback but do not change environment unless explicitly requested
+  # You can set JAVA_HOME to point to JDK 17 for local development
+  if command -v cygpath >/dev/null 2>&1; then
+    JAVA_HOME="$(cygpath -u "$JAVA_HOME_WIN")"
+  else
+    JAVA_HOME="/c/Program Files/Java/jdk-24"
+  fi
 fi
 export JAVA_HOME
 export PATH="$JAVA_HOME/bin:$PATH"
