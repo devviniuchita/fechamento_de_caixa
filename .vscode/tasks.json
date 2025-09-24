@@ -195,6 +195,34 @@
 				"$maven"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Run tests (cmd, skip jacoco)",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/c",
+				"mvnw.cmd -q -Djacoco.skip=true -Djacoco.agent.skip=true -DskipJacoco=true -Dspring.profiles.active=test test"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run tests (Windows cmd)",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/c",
+				"mvnw.cmd -Dspring.profiles.active=test -Djacoco.skip=true -Djacoco.agent.skip=true -DskipJacoco=true test"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$maven"
+			],
+			"group": "test"
 		}
 	]
 }

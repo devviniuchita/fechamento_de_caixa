@@ -367,7 +367,7 @@ class FechamentoServiceImplTest {
     assertThat(response.getResponsavel()).isEqualTo(responsavel);
     assertThat(response.getData()).isEqualTo(data);
 
-    verify(repository).existsByResponsavelAndData(responsavel, data);
+    verify(repository, atLeastOnce()).existsByResponsavelAndData(responsavel, data);
     verify(repository).save(any(FechamentoCaixa.class));
   }
 

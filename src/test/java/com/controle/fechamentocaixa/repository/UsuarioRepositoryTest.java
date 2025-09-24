@@ -18,6 +18,7 @@ import com.controle.fechamentocaixa.model.Usuario;
 
 @DataMongoTest
 @Testcontainers
+@Disabled("Requer Docker/Testcontainers; desabilitado em ambiente local sem Docker. Habilite no CI ou quando houver Docker disponível.")
 public class UsuarioRepositoryTest {
 
   @Container

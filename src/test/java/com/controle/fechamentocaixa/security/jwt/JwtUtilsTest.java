@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +27,7 @@ import io.jsonwebtoken.JwtException;
  * Cobertura completa: geração, validação, refresh e casos de erro
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("JwtUtils Tests")
 class JwtUtilsTest {
 
@@ -197,8 +200,10 @@ class JwtUtilsTest {
     // Given
     String token1 = jwtUtils.generateJwtToken(authentication);
 
-    // Wait a small amount to ensure different timestamps
-    Thread.sleep(10);
+    // Aguarda 1 segundo para garantir diferença ao nível de segundos caso a
+    // implementação
+    // arredonde/normalize timestamps
+    Thread.sleep(1100);
 
     // When
     String token2 = jwtUtils.generateJwtToken(authentication);

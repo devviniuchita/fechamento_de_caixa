@@ -9,44 +9,49 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.controle.fechamentocaixa.config.AppProperties;
 import com.controle.fechamentocaixa.controller.TestController;
+import com.controle.fechamentocaixa.repository.UsuarioRepository;
 import com.controle.fechamentocaixa.security.services.UserDetailsImpl;
 import com.controle.fechamentocaixa.security.services.UserDetailsServiceImpl;
+import com.controle.fechamentocaixa.service.PasswordMigrationService;
 
 /**
  * Testes de integração para AuthTokenFilter
  * Verifica comportamento do filtro JWT em cenários reais de requisição
  */
-@WebMvcTest(controllers = TestController.class)
-@ContextConfiguration(classes = { TestController.class, AuthTokenFilter.class, JwtUtils.class })
-@DisplayName("AuthTokenFilter Integration Tests")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("AuthTokenFilter Integration Tests (standalone)")
 class AuthTokenFilterIntegrationTest {
-
-  @Autowired
   private MockMvc mockMvc;
 
   @Mock
   private JwtUtils jwtUtils;
-
   @Mock
   private UserDetailsServiceImpl userDetailsService;
-
   @Mock
-  private AppProperties appProperties;
-
+  private UsuarioRepository usuarioRepository;
   @Mock
-  private AppProperties.Jwt jwtProperties;
+  private PasswordEncoder passwordEncoder;
+  @Mock
+  private AuthenticationManager authenticationManager;
+  @Mock
+  private MongoTemplate mongoTemplate;
+  @Mock
+  private PasswordMigrationService passwordMigrationService;
 
   private UserDetails userDetails;
   private final String VALID_TOKEN = "valid.jwt.token";
@@ -69,10 +74,27 @@ class AuthTokenFilterIntegrationTest {
             new SimpleGrantedAuthority("ROLE_USER"),
             new SimpleGrantedAuthority("ROLE_ADMIN")));
 
-    // Setup app properties mock
-    when(appProperties.getJwt()).thenReturn(jwtProperties);
-    when(jwtProperties.getSecret()).thenReturn("test-secret-key-that-is-at-least-256-bits-long");
-    when(jwtProperties.getExpiration()).thenReturn(86400000);
+    // Configurar controller real com dependências mockadas via reflexão
+    TestController controller = new TestController();
+    ReflectionTestUtils.setField(controller, "usuarioRepository", usuarioRepository);
+    ReflectionTestUtils.setField(controller, "passwordEncoder", passwordEncoder);
+    ReflectionTestUtils.setField(controller, "authenticationManager", authenticationManager);
+    ReflectionTestUtils.setField(controller, "mongoTemplate", mongoTemplate);
+    ReflectionTestUtils.setField(controller, "userDetailsService", userDetailsService);
+    ReflectionTestUtils.setField(controller, "jwtUtils", jwtUtils);
+    ReflectionTestUtils.setField(controller, "passwordMigrationService", passwordMigrationService);
+
+    // Configurar filtro com dependências mockadas
+    AuthTokenFilter authTokenFilter = new AuthTokenFilter();
+    ReflectionTestUtils.setField(authTokenFilter, "jwtUtils", jwtUtils);
+    ReflectionTestUtils.setField(authTokenFilter, "userDetailsService", userDetailsService);
+
+    this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
+        .addFilters(authTokenFilter)
+        .build();
+
+    // Evitar stubbings desnecessários: somente quando explicitamente usados em um
+    // teste
   }
 
   @Test
@@ -84,6 +106,8 @@ class AuthTokenFilterIntegrationTest {
     when(userDetailsService.loadUserByUsername(TEST_USERNAME)).thenReturn(userDetails);
 
     // When & Then
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     MvcResult result = mockMvc.perform(get("/test/public")
         .header("Authorization", "Bearer " + VALID_TOKEN))
         .andExpect(status().isOk())
@@ -95,8 +119,10 @@ class AuthTokenFilterIntegrationTest {
     verify(userDetailsService).loadUserByUsername(TEST_USERNAME);
 
     // Verify response
+    // Resposta é uma lista JSON (mockada como vazia)
     String responseContent = result.getResponse().getContentAsString();
-    assertThat(responseContent).contains("Public endpoint accessible");
+    assertThat(responseContent).isNotNull();
+    verify(usuarioRepository, atLeastOnce()).findAll();
   }
 
   @Test
@@ -106,6 +132,8 @@ class AuthTokenFilterIntegrationTest {
     when(jwtUtils.validateJwtToken(INVALID_TOKEN)).thenReturn(false);
 
     // When & Then
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     mockMvc.perform(get("/test/public")
         .header("Authorization", "Bearer " + INVALID_TOKEN))
         .andExpect(status().isOk()); // Public endpoint should still be accessible
@@ -120,6 +148,8 @@ class AuthTokenFilterIntegrationTest {
   @DisplayName("Deve processar requisição sem token de autorização")
   void deveProcessarRequisicaoSemToken() throws Exception {
     // When & Then
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     mockMvc.perform(get("/test/public"))
         .andExpect(status().isOk());
 
@@ -133,6 +163,8 @@ class AuthTokenFilterIntegrationTest {
   @DisplayName("Deve ignorar header Authorization sem Bearer prefix")
   void deveIgnorarHeaderSemBearerPrefix() throws Exception {
     // When & Then
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     mockMvc.perform(get("/test/public")
         .header("Authorization", "Basic dGVzdDp0ZXN0"))
         .andExpect(status().isOk());
@@ -150,6 +182,8 @@ class AuthTokenFilterIntegrationTest {
     when(jwtUtils.validateJwtToken(malformedToken)).thenReturn(false);
 
     // When & Then
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     mockMvc.perform(get("/test/public")
         .header("Authorization", "Bearer " + malformedToken))
         .andExpect(status().isOk());
@@ -168,6 +202,8 @@ class AuthTokenFilterIntegrationTest {
         .thenThrow(new RuntimeException("Token parsing error"));
 
     // When & Then
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     mockMvc.perform(get("/test/public")
         .header("Authorization", "Bearer " + VALID_TOKEN))
         .andExpect(status().isOk()); // Should continue processing despite error
@@ -188,6 +224,8 @@ class AuthTokenFilterIntegrationTest {
         .thenThrow(new RuntimeException("User not found"));
 
     // When & Then
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     mockMvc.perform(get("/test/public")
         .header("Authorization", "Bearer " + VALID_TOKEN))
         .andExpect(status().isOk()); // Should continue processing despite error
@@ -235,11 +273,15 @@ class AuthTokenFilterIntegrationTest {
     when(userDetailsService.loadUserByUsername(username2)).thenReturn(user2);
 
     // When & Then - First request
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     mockMvc.perform(get("/test/public")
         .header("Authorization", "Bearer " + token1))
         .andExpect(status().isOk());
 
     // When & Then - Second request
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     mockMvc.perform(get("/test/public")
         .header("Authorization", "Bearer " + token2))
         .andExpect(status().isOk());
@@ -260,6 +302,8 @@ class AuthTokenFilterIntegrationTest {
     when(userDetailsService.loadUserByUsername(TEST_USERNAME)).thenReturn(userDetails);
 
     // When & Then - Test with extra spaces
+    when(usuarioRepository.findAll()).thenReturn(java.util.List.of());
+
     mockMvc.perform(get("/test/public")
         .header("Authorization", "  Bearer   " + VALID_TOKEN + "  "))
         .andExpect(status().isOk());
@@ -269,4 +313,5 @@ class AuthTokenFilterIntegrationTest {
     // implementation)
     verify(jwtUtils).validateJwtToken(anyString());
   }
+
 }

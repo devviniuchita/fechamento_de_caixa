@@ -64,13 +64,12 @@ class CalculationServiceTest {
   @DisplayName("Deve calcular total de ativos corretamente")
   void deveCalcularTotalAtivos() {
     // Given
-    FormasPagamento formas = FormasPagamento.builder()
-        .dinheiro(new BigDecimal("100.00"))
-        .pix(new BigDecimal("50.00"))
-        .deposito(new BigDecimal("25.00"))
-        .vale(new BigDecimal("10.00"))
-        .sangria(new BigDecimal("15.00"))
-        .build();
+    FormasPagamento formas = new FormasPagamento();
+    formas.setDinheiro(new BigDecimal("100.00"));
+    formas.setPix(new BigDecimal("50.00"));
+    formas.setDeposito(new BigDecimal("25.00"));
+    formas.setVale(new BigDecimal("10.00"));
+    formas.setSangria(new BigDecimal("15.00"));
 
     // When
     BigDecimal total = calculationService.calcularTotalAtivos(formas);
@@ -93,11 +92,10 @@ class CalculationServiceTest {
   @DisplayName("Deve calcular total de débito por bandeira")
   void deveCalcularTotalDebito() {
     // Given
-    CartaoDebito debito = CartaoDebito.builder()
-        .visa(new BigDecimal("30.00"))
-        .master(new BigDecimal("20.00"))
-        .elo(new BigDecimal("10.00"))
-        .build();
+    CartaoDebito debito = new CartaoDebito();
+    debito.setVisa(new BigDecimal("30.00"));
+    debito.setMaster(new BigDecimal("20.00"));
+    debito.setElo(new BigDecimal("10.00"));
 
     // When
     BigDecimal total = calculationService.calcularTotalDebito(debito);
@@ -120,11 +118,10 @@ class CalculationServiceTest {
   @DisplayName("Deve calcular total de crédito por bandeira")
   void deveCalcularTotalCredito() {
     // Given
-    CartaoCredito credito = CartaoCredito.builder()
-        .visa(new BigDecimal("50.00"))
-        .master(new BigDecimal("40.00"))
-        .elo(new BigDecimal("20.00"))
-        .build();
+    CartaoCredito credito = new CartaoCredito();
+    credito.setVisa(new BigDecimal("50.00"));
+    credito.setMaster(new BigDecimal("40.00"));
+    credito.setElo(new BigDecimal("20.00"));
 
     // When
     BigDecimal total = calculationService.calcularTotalCredito(credito);
@@ -137,17 +134,15 @@ class CalculationServiceTest {
   @DisplayName("Deve calcular total de cartões incluindo voucher")
   void deveCalcularTotalCartoes() {
     // Given
-    CartaoDebito debito = CartaoDebito.builder()
-        .visa(new BigDecimal("30.00"))
-        .master(new BigDecimal("20.00"))
-        .elo(new BigDecimal("10.00"))
-        .build();
+    CartaoDebito debito = new CartaoDebito();
+    debito.setVisa(new BigDecimal("30.00"));
+    debito.setMaster(new BigDecimal("20.00"));
+    debito.setElo(new BigDecimal("10.00"));
 
-    CartaoCredito credito = CartaoCredito.builder()
-        .visa(new BigDecimal("50.00"))
-        .master(new BigDecimal("40.00"))
-        .elo(new BigDecimal("20.00"))
-        .build();
+    CartaoCredito credito = new CartaoCredito();
+    credito.setVisa(new BigDecimal("50.00"));
+    credito.setMaster(new BigDecimal("40.00"));
+    credito.setElo(new BigDecimal("20.00"));
 
     BigDecimal voucher = new BigDecimal("15.00");
 
@@ -162,15 +157,13 @@ class CalculationServiceTest {
   @DisplayName("Deve calcular total de despesas")
   void deveCalcularTotalDespesas() {
     // Given
-    Despesa despesa1 = Despesa.builder()
-        .descricao("Água")
-        .valor(new BigDecimal("5.50"))
-        .build();
+    Despesa despesa1 = new Despesa();
+    despesa1.setDescricao("Água");
+    despesa1.setValor(new BigDecimal("5.50"));
 
-    Despesa despesa2 = Despesa.builder()
-        .descricao("Café")
-        .valor(new BigDecimal("3.25"))
-        .build();
+    Despesa despesa2 = new Despesa();
+    despesa2.setDescricao("Café");
+    despesa2.setValor(new BigDecimal("3.25"));
 
     // When
     BigDecimal total = calculationService.calcularTotalDespesas(Arrays.asList(despesa1, despesa2));
@@ -222,9 +215,8 @@ class CalculationServiceTest {
   @DisplayName("Deve verificar consistência como inconsistente quando delta > tolerância")
   void deveVerificarInconsistencia() {
     // Given
-    TotaisFechamento totais = TotaisFechamento.builder()
-        .totalCaixa(new BigDecimal("-34.50"))
-        .build();
+    TotaisFechamento totais = new TotaisFechamento();
+    totais.setTotalCaixa(new BigDecimal("-34.50"));
 
     // When
     ConsistenciaResult resultado = calculationService.verificarConsistencia(totais);
@@ -240,9 +232,8 @@ class CalculationServiceTest {
   @DisplayName("Deve verificar consistência como consistente quando delta <= tolerância")
   void deveVerificarConsistencia() {
     // Given
-    TotaisFechamento totais = TotaisFechamento.builder()
-        .totalCaixa(new BigDecimal("0.01"))
-        .build();
+    TotaisFechamento totais = new TotaisFechamento();
+    totais.setTotalCaixa(new BigDecimal("0.01"));
 
     // When
     ConsistenciaResult resultado = calculationService.verificarConsistencia(totais);
@@ -257,9 +248,8 @@ class CalculationServiceTest {
   @DisplayName("Deve verificar consistência como consistente quando delta é zero")
   void deveVerificarConsistenciaComDeltaZero() {
     // Given
-    TotaisFechamento totais = TotaisFechamento.builder()
-        .totalCaixa(BigDecimal.ZERO)
-        .build();
+    TotaisFechamento totais = new TotaisFechamento();
+    totais.setTotalCaixa(BigDecimal.ZERO);
 
     // When
     ConsistenciaResult resultado = calculationService.verificarConsistencia(totais);
@@ -272,43 +262,39 @@ class CalculationServiceTest {
 
   // Método auxiliar para criar request válido
   private FechamentoRequest createValidFechamentoRequest() {
-    CartaoDebito debito = CartaoDebito.builder()
-        .visa(new BigDecimal("30.00"))
-        .master(new BigDecimal("20.00"))
-        .elo(new BigDecimal("10.00"))
-        .build();
+    CartaoDebito debito = new CartaoDebito();
+    debito.setVisa(new BigDecimal("30.00"));
+    debito.setMaster(new BigDecimal("20.00"));
+    debito.setElo(new BigDecimal("10.00"));
 
-    CartaoCredito credito = CartaoCredito.builder()
-        .visa(new BigDecimal("50.00"))
-        .master(new BigDecimal("40.00"))
-        .elo(new BigDecimal("20.00"))
-        .build();
+    CartaoCredito credito = new CartaoCredito();
+    credito.setVisa(new BigDecimal("50.00"));
+    credito.setMaster(new BigDecimal("40.00"));
+    credito.setElo(new BigDecimal("20.00"));
 
-    FormasPagamento formas = FormasPagamento.builder()
-        .dinheiro(new BigDecimal("100.00"))
-        .pix(new BigDecimal("15.00"))
-        .deposito(new BigDecimal("10.00"))
-        .vale(new BigDecimal("10.00"))
-        .sangria(new BigDecimal("40.00"))
-        .debito(debito)
-        .credito(credito)
-        .voucher(new BigDecimal("15.00"))
-        .build();
+    FormasPagamento formas = new FormasPagamento();
+    formas.setDinheiro(new BigDecimal("100.00"));
+    formas.setPix(new BigDecimal("15.00"));
+    formas.setDeposito(new BigDecimal("10.00"));
+    formas.setVale(new BigDecimal("10.00"));
+    formas.setSangria(new BigDecimal("40.00"));
+    formas.setDebito(debito);
+    formas.setCredito(credito);
+    formas.setVoucher(new BigDecimal("15.00"));
 
-    Despesa despesa = Despesa.builder()
-        .descricao("Água")
-        .valor(new BigDecimal("5.50"))
-        .build();
+    Despesa despesa = new Despesa();
+    despesa.setDescricao("Água");
+    despesa.setValor(new BigDecimal("5.50"));
 
-    return FechamentoRequest.builder()
-        .data(LocalDate.now())
-        .responsavel("test-user")
-        .caixaInicial(new BigDecimal("100.00"))
-        .vendas(new BigDecimal("250.00"))
-        .trocoInserido(new BigDecimal("50.00"))
-        .formasPagamento(formas)
-        .despesas(Arrays.asList(despesa))
-        .observacoes("Test closing")
-        .build();
+    FechamentoRequest req = new FechamentoRequest();
+    req.setData(LocalDate.now());
+    req.setResponsavel("test-user");
+    req.setCaixaInicial(new BigDecimal("100.00"));
+    req.setVendas(new BigDecimal("250.00"));
+    req.setTrocoInserido(new BigDecimal("50.00"));
+    req.setFormasPagamento(formas);
+    req.setDespesas(Arrays.asList(despesa));
+    req.setObservacoes("Test closing");
+    return req;
   }
 }

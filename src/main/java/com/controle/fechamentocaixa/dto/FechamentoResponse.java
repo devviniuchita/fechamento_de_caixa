@@ -185,4 +185,101 @@ public class FechamentoResponse {
   public FechamentoResponse build() {
     return this;
   }
+
+  // Getters explícitos para compatibilidade com testes
+  public String getId() {
+    return id;
+  }
+
+  public LocalDate getData() {
+    return data;
+  }
+
+  public String getResponsavel() {
+    return responsavel;
+  }
+
+  public BigDecimal getCaixaInicial() {
+    return caixaInicial;
+  }
+
+  public BigDecimal getVendas() {
+    return vendas;
+  }
+
+  public BigDecimal getTrocoInserido() {
+    return trocoInserido;
+  }
+
+  public FormasPagamento getFormasPagamento() {
+    return formasPagamento;
+  }
+
+  public List<Despesa> getDespesas() {
+    return despesas;
+  }
+
+  public BigDecimal getTotalEntradas() {
+    return totalEntradas;
+  }
+
+  public BigDecimal getTotalAtivos() {
+    return totalAtivos;
+  }
+
+  public BigDecimal getTotalDebito() {
+    return totalDebito;
+  }
+
+  public BigDecimal getTotalCredito() {
+    return totalCredito;
+  }
+
+  public BigDecimal getTotalCartoes() {
+    return totalCartoes;
+  }
+
+  public BigDecimal getTotalDespesas() {
+    return totalDespesas;
+  }
+
+  public BigDecimal getTotalCaixa() {
+    return totalCaixa;
+  }
+
+  public Boolean getConsistente() {
+    return consistente;
+  }
+
+  public BigDecimal getDelta() {
+    return delta;
+  }
+
+  public StatusFechamento getStatus() {
+    return status;
+  }
+
+  public String getObservacoes() {
+    return observacoes;
+  }
+
+  public List<String> getComprovantes() {
+    return comprovantes;
+  }
+
+  public LocalDateTime getCriadoEm() {
+    return criadoEm;
+  }
+
+  public LocalDateTime getAtualizadoEm() {
+    return atualizadoEm;
+  }
+
+  public String getCriadoPor() {
+    return criadoPor;
+  }
+
+  public String getAtualizadoPor() {
+    return atualizadoPor;
+  }
 }
