@@ -8,27 +8,44 @@ import java.util.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import com.controle.fechamentocaixa.model.Perfil;
 import com.controle.fechamentocaixa.model.Usuario;
 
 @DataMongoTest
-@Testcontainers
-@Disabled("Requer Docker/Testcontainers; desabilitado em ambiente local sem Docker. Habilite no CI ou quando houver Docker disponível.")
+@EnabledIfEnvironmentVariable(named = "ENABLE_DOCKER_TESTS", matches = "true")
 public class UsuarioRepositoryTest {
 
-  @Container
-  @ServiceConnection
   static MongoDBContainer mongo = new MongoDBContainer("mongo:6.0.8");
 
   @Autowired
   private UsuarioRepository usuarioRepository;
 
   private Usuario usuario;
+
+  @BeforeAll
+  static void startMongo() {
+    if (!"true".equals(System.getenv("ENABLE_DOCKER_TESTS"))) {
+      Assumptions.assumeTrue(false, "Docker-based tests desabilitados: defina ENABLE_DOCKER_TESTS=true para executar este teste.");
+    }
+    mongo.start();
+  }
+
+  @AfterAll
+  static void stopMongo() {
+    if (mongo != null) {
+      mongo.stop();
+    }
+  }
+
+  @org.springframework.test.context.DynamicPropertySource
+  static void mongoProps(org.springframework.test.context.DynamicPropertyRegistry registry) {
+    registry.add("spring.data.mongodb.uri", mongo::getConnectionString);
+  }
 
   @BeforeEach
   void setup() {
