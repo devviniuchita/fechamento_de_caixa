@@ -1,0 +1,54 @@
+name: CI (Maven, JDK 17)
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Show Java and Maven versions
+        run: |
+          java -version
+          ./mvnw -v
+
+      - name: Build with Maven (tests on, Docker tests disabled by default)
+        env:
+          # Docker-based tests (UsuarioRepositoryTest) are disabled unless explicitly set to "true"
+          ENABLE_DOCKER_TESTS: "false"
+        run: |
+          ./mvnw -B -ntp -Dstyle.color=always verify
+
+      - name: Upload test reports (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: |
+            **/target/surefire-reports/**
+            **/target/site/jacoco/**
+
+      - name: Build with Docker-based tests (optional)
+        if: ${{ false }} # Flip to `true` or duplicate this job in a matrix when Docker is available
+        env:
+          ENABLE_DOCKER_TESTS: "true"
+        run: |
+          ./mvnw -B -ntp -Dstyle.color=always verify
